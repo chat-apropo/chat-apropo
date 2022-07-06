@@ -14,17 +14,17 @@ class ChanPage extends StatefulWidget {
 class _ChanPageState extends State<ChanPage> {
   List<Channels> channels = [
     Channels(
-        name: "romanian",
+        name: "#romanian",
         messageText: "Last message here",
         image: "images/userImage1.jpeg",
         time: "Now"),
     Channels(
-        name: "bots",
+        name: "#bots",
         messageText: "Last message here",
         image: "images/userImage2.jpeg",
         time: "Yesterday"),
     Channels(
-        name: "radio",
+        name: "#radio",
         messageText: "Last message here",
         image: "images/userImage3.jpeg",
         time: "31 Mar"),

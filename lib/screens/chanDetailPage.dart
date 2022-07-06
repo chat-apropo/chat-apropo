@@ -11,29 +11,43 @@ class ChanDetailPage extends StatefulWidget {
 }
 
 class ChanDetailPageState extends State<ChanDetailPage> {
-  List<ChannelMessage> messages = [
-    ChannelMessage(message: "Hello, Will", sender: "No one"),
-  ];
+  List<ChannelMessage> messages = [];
 
   var irc = IrcClient();
   final textField = TextEditingController();
+  final textFocusNode = FocusNode();
+  late String channel;
 
-  void _join(){
+  void _join() {
     irc.client.join(widget.channel);
   }
 
-  void _part(){
+  void _part() {
     irc.client.part(widget.channel);
   }
 
   @override
   void initState() {
     super.initState();
-    irc.client.onClientJoin.listen((event) async {
-        setState(() {
-            messages.add(ChannelMessage(message: "JOINED CHANNEL", sender: "${widget.channel}"));
-        });
+    channel = widget.channel;
+    irc.client.onClientJoin.listen((event) {
+      setState(() {
+        messages.add(
+            ChannelMessage(message: "JOINED CHANNEL", sender: widget.channel));
+      });
     });
+
+    irc.client.onMessage.listen((event) {
+      print("<${event.target!.name}><${event.from?.name}> ${event.message}");
+
+      setState(() {
+        if (event.target?.name == widget.channel) {
+          messages.add(ChannelMessage(
+              message: event.message ?? "", sender: event.from?.name ?? "--"));
+        }
+      });
+    });
+
     _join();
   }
 
@@ -42,8 +56,14 @@ class ChanDetailPageState extends State<ChanDetailPage> {
       irc.client.sendMessage(widget.channel, text);
       textField.clear();
       messages.add(ChannelMessage(message: text, sender: "You", isMine: true));
+      textFocusNode.requestFocus();
     });
+  }
 
+  @override
+  void dispose() {
+    textFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -84,9 +104,9 @@ class ChanDetailPageState extends State<ChanDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      const Text(
-                        "Kriss Benwat",
-                        style: TextStyle(
+                      Text(
+                        channel,
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(
@@ -111,35 +131,37 @@ class ChanDetailPageState extends State<ChanDetailPage> {
       ),
       body: Stack(
         children: <Widget>[
-          ListView.builder(
-            itemCount: messages.length,
-            shrinkWrap: true,
-            padding: const EdgeInsets.only(top: 10, bottom: 10),
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              return Container(
-                padding: const EdgeInsets.only(
-                    left: 14, right: 14, top: 10, bottom: 10),
-                child: Align(
-                  alignment: (!messages[index].isMine
-                      ? Alignment.topLeft
-                      : Alignment.topRight),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: (!messages[index].isMine
-                          ? Colors.grey.shade200
-                          : Colors.blue[200]),
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      messages[index].message,
-                      style: const TextStyle(fontSize: 15),
+          Flexible(
+            child: ListView.builder(
+              itemCount: messages.length,
+              shrinkWrap: true,
+              physics: const ClampingScrollPhysics(),
+              padding: const EdgeInsets.only(top: 10, bottom: 100),
+              itemBuilder: (context, index) {
+                return Container(
+                  padding: const EdgeInsets.only(
+                      left: 14, right: 14, top: 10, bottom: 10),
+                  child: Align(
+                    alignment: (!messages[index].isMine
+                        ? Alignment.topLeft
+                        : Alignment.topRight),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: (!messages[index].isMine
+                            ? Colors.grey.shade200
+                            : Colors.blue[200]),
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        messages[index].message,
+                        style: const TextStyle(fontSize: 15),
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
           Align(
             alignment: Alignment.bottomLeft,
@@ -173,6 +195,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
                     child: TextField(
                       controller: textField,
                       autofocus: true,
+                      focusNode: textFocusNode,
                       onSubmitted: _submit,
                       decoration: const InputDecoration(
                           hintText: "Write message...",
