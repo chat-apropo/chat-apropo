@@ -3,6 +3,9 @@ import 'package:gasconchat/ircClient.dart';
 import 'package:gasconchat/models/channelMessageModel.dart';
 import 'package:gasconchat/widgets/ircTextMessage.dart';
 
+// Number of pixels to scroll up by to show the go to bottom button
+const SHOW_SCROLLDOWN_BUTTON_UP_BY = 400;
+
 class ChanDetailPage extends StatefulWidget {
   String channel;
   ChanDetailPage({Key? key, required this.channel}) : super(key: key);
@@ -15,6 +18,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
   List<ChannelMessage> messages = [];
 
   var irc = IrcClient();
+  bool showGoToBottomButton = false;
   final textField = TextEditingController();
   final textFocusNode = FocusNode();
   ScrollController scrollController = ScrollController();
@@ -31,7 +35,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
   void scrollDown() {
     if (scrollController.hasClients) {
       scrollController.animateTo(
-        scrollController.position.maxScrollExtent,
+        scrollController.position.maxScrollExtent + 800,
         curve: Curves.easeOut,
         duration: const Duration(milliseconds: 500),
       );
@@ -42,6 +46,8 @@ class ChanDetailPageState extends State<ChanDetailPage> {
   void initState() {
     super.initState();
     channel = widget.channel;
+
+    // Joined channel
     irc.client.onClientJoin.listen((event) {
       setState(() {
         messages.add(
@@ -49,6 +55,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
       });
     });
 
+    // Message arrived
     irc.client.onMessage.listen((event) {
       print("<${event.target!.name}><${event.from?.name}> ${event.message}");
 
@@ -56,6 +63,12 @@ class ChanDetailPageState extends State<ChanDetailPage> {
         if (event.target?.name == widget.channel) {
           messages.add(ChannelMessage(
               text: event.message ?? "", sender: event.from?.name ?? "--"));
+
+          var pos = scrollController.position.pixels;
+          var distanceToBottom = scrollController.position.maxScrollExtent - pos;
+          if (!showGoToBottomButton || distanceToBottom < SHOW_SCROLLDOWN_BUTTON_UP_BY) {
+            scrollDown();
+          }
         }
       });
     });
@@ -67,8 +80,9 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     setState(() {
       irc.client.sendMessage(widget.channel, text);
       textField.clear();
-      messages.add(ChannelMessage(text: text, sender: "You", isMine: true));
+      messages.add(ChannelMessage(text: text, sender: irc.client.nickname ?? "You", isMine: true));
       textFocusNode.requestFocus();
+      scrollDown();
     });
   }
 
@@ -81,6 +95,16 @@ class ChanDetailPageState extends State<ChanDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: Visibility(
+        visible: showGoToBottomButton,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 120.0),
+          child: FloatingActionButton(
+            onPressed: scrollDown,
+            child: const Icon(Icons.arrow_downward),
+          ),
+        ),
+      ),
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
@@ -144,16 +168,28 @@ class ChanDetailPageState extends State<ChanDetailPage> {
       body: Stack(
         children: <Widget>[
           Flexible(
-            child: ListView.builder(
-              itemCount: messages.length,
-              shrinkWrap: true,
-              controller: scrollController,
-              physics: const ClampingScrollPhysics(),
-              padding: const EdgeInsets.only(top: 10, bottom: 100),
-              itemBuilder: (context, index) {
-                var message = messages[index];
-                return IrcText(message: message);
+            child: NotificationListener(
+              onNotification: (notification) {
+                if (notification is ScrollUpdateNotification) {
+                  var pos = scrollController.position.pixels;
+                  var distanceToBottom = scrollController.position.maxScrollExtent - pos;
+                  setState(() {
+                    showGoToBottomButton = distanceToBottom > SHOW_SCROLLDOWN_BUTTON_UP_BY;
+                  });
+                }
+                return false;
               },
+              child: ListView.builder(
+                itemCount: messages.length,
+                shrinkWrap: true,
+                controller: scrollController,
+                physics: const ClampingScrollPhysics(),
+                padding: const EdgeInsets.only(top: 10, bottom: 100),
+                itemBuilder: (context, index) {
+                  var message = messages[index];
+                  return IrcText(message: message);
+                },
+              ),
             ),
           ),
           Align(
