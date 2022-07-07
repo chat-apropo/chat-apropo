@@ -17,21 +17,6 @@ final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
   textTheme: textTheme);
 
-final List<Color> colorPallete = <Color>[
-  Colors.blue,
-  Colors.red,
-  Colors.green,
-  Colors.orange,
-  Colors.cyan,
-  Colors.lightBlue,
-  Colors.lightGreen,
-  Colors.purple,
-  Colors.indigo,
-  Colors.teal,
-  Colors.amber
-];
-
-
 void main() {
   runApp(const MyApp());
 }

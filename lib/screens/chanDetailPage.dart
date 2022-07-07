@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gasconchat/ircClient.dart';
 import 'package:gasconchat/models/channelMessageModel.dart';
+import 'package:gasconchat/widgets/ircTextMessage.dart';
 
 class ChanDetailPage extends StatefulWidget {
   String channel;
@@ -16,6 +17,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
   var irc = IrcClient();
   final textField = TextEditingController();
   final textFocusNode = FocusNode();
+  ScrollController scrollController = ScrollController();
   late String channel;
 
   void _join() {
@@ -26,6 +28,16 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     irc.client.part(widget.channel);
   }
 
+  void scrollDown() {
+    if (scrollController.hasClients) {
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        curve: Curves.easeOut,
+        duration: const Duration(milliseconds: 500),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -33,7 +45,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     irc.client.onClientJoin.listen((event) {
       setState(() {
         messages.add(
-            ChannelMessage(message: "JOINED CHANNEL", sender: widget.channel));
+            ChannelMessage(text: "JOINED CHANNEL", sender: widget.channel));
       });
     });
 
@@ -43,7 +55,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
       setState(() {
         if (event.target?.name == widget.channel) {
           messages.add(ChannelMessage(
-              message: event.message ?? "", sender: event.from?.name ?? "--"));
+              text: event.message ?? "", sender: event.from?.name ?? "--"));
         }
       });
     });
@@ -55,7 +67,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     setState(() {
       irc.client.sendMessage(widget.channel, text);
       textField.clear();
-      messages.add(ChannelMessage(message: text, sender: "You", isMine: true));
+      messages.add(ChannelMessage(text: text, sender: "You", isMine: true));
       textFocusNode.requestFocus();
     });
   }
@@ -135,31 +147,12 @@ class ChanDetailPageState extends State<ChanDetailPage> {
             child: ListView.builder(
               itemCount: messages.length,
               shrinkWrap: true,
+              controller: scrollController,
               physics: const ClampingScrollPhysics(),
               padding: const EdgeInsets.only(top: 10, bottom: 100),
               itemBuilder: (context, index) {
-                return Container(
-                  padding: const EdgeInsets.only(
-                      left: 14, right: 14, top: 10, bottom: 10),
-                  child: Align(
-                    alignment: (!messages[index].isMine
-                        ? Alignment.topLeft
-                        : Alignment.topRight),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: (!messages[index].isMine
-                            ? Colors.grey.shade200
-                            : Colors.blue[200]),
-                      ),
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        messages[index].message,
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                    ),
-                  ),
-                );
+                var message = messages[index];
+                return IrcText(message: message);
               },
             ),
           ),

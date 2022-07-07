@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 
 class ChannelMessage {
-  String message;
+  String text;
   String sender;
   bool isMine;
-  ChannelMessage({required this.message, required this.sender, this.isMine=false});
+  ChannelMessage({required this.text, required this.sender, this.isMine=false});
 }
