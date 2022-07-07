@@ -1,0 +1,42 @@
+version: 2.1
+
+executors:
+  android-flutter:
+    docker:
+      - image: gmemstr/flutter-fastlane:latest
+    environment:
+      TERM: dumb
+      _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
+
+jobs:
+  build-and-github-deploy:
+    executor: android-flutter
+    steps:
+      - checkout
+      - run: flutter build linux --release
+      - run: flutter build apk --split-per-abi
+      - run:
+          name: Github release
+          command: bash .circleci/release.sh
+
+  # beta_deploy:
+  #   executor: android-flutter
+  #   steps:
+  #     - checkout
+  #     - run: echo "$PLAY_STORE_UPLOAD_KEY" | base64 --decode > key.jks
+  #     - run: echo "$PLAY_STORE_UPLOAD_KEY_INFO" | base64 --decode > android/key.properties
+  #     - run: cd android && fastlane beta
+
+workflows:
+  deploy:
+    jobs:
+      - build-and-github-deploy:
+          filters:
+            branches:
+              only: master
+
+      # - beta_deploy:
+      #     filters:
+      #       branches:
+      #         only: beta
