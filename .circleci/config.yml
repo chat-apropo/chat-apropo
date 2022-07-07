@@ -3,17 +3,20 @@ version: 2.1
 executors:
   android-flutter:
     docker:
-      - image: gmemstr/flutter-fastlane:latest
+      - image: cirrusci/flutter:latest
     environment:
       TERM: dumb
-      _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
+      # _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      # GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
 
 jobs:
   build-and-github-deploy:
     executor: android-flutter
     steps:
       - checkout
+      - run: sudo apt update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev default-jdk default-jre
+
+      - run: flutter pub get
       - run: flutter build linux --release
       - run: flutter build apk --split-per-abi
       - run:
