@@ -2,10 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:gasconchat/ircClient.dart';
 import 'package:gasconchat/models/channelMessageModel.dart';
 import 'package:gasconchat/widgets/ircTextMessage.dart';
+import 'package:any_link_preview/any_link_preview.dart';
 
 // Number of pixels to scroll up by to show the go to bottom button
 const SHOW_SCROLLDOWN_BUTTON_UP_BY = 400;
 
+String? findUrlInText(String text) {
+  final RegExp urlRegExp = RegExp(
+      r"((https?:www\.)|(https?:\/\/)|(www\.))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?");
+  final RegExpMatch? match = urlRegExp.firstMatch(text);
+  if (match != null) {
+    return match.group(0);
+  }
+  return null;
+}
+
+bool _getUrlValid(String url) {
+  bool isUrlValid = AnyLinkPreview.isValidLink(
+    url,
+    protocols: ['http', 'https'],
+    hostWhitelist: ['https://youtube.com/'],
+    hostBlacklist: ['https://facebook.com/'],
+  );
+  return isUrlValid;
+}
+
+// ignore: must_be_immutable
 class ChanDetailPage extends StatefulWidget {
   String channel;
   ChanDetailPage({Key? key, required this.channel}) : super(key: key);
@@ -57,7 +79,8 @@ class ChanDetailPageState extends State<ChanDetailPage> {
 
     // Message arrived
     irc.client.onMessage.listen((event) {
-      print("<${event.target!.name}><${event.from?.name}> ${event.message}");
+      debugPrint(
+          "<${event.target!.name}><${event.from?.name}> ${event.message}");
 
       setState(() {
         if (event.target?.name == widget.channel) {
@@ -65,8 +88,10 @@ class ChanDetailPageState extends State<ChanDetailPage> {
               text: event.message ?? "", sender: event.from?.name ?? "--"));
 
           var pos = scrollController.position.pixels;
-          var distanceToBottom = scrollController.position.maxScrollExtent - pos;
-          if (!showGoToBottomButton || distanceToBottom < SHOW_SCROLLDOWN_BUTTON_UP_BY) {
+          var distanceToBottom =
+              scrollController.position.maxScrollExtent - pos;
+          if (!showGoToBottomButton ||
+              distanceToBottom < SHOW_SCROLLDOWN_BUTTON_UP_BY) {
             scrollDown();
           }
         }
@@ -80,7 +105,8 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     setState(() {
       irc.client.sendMessage(widget.channel, text);
       textField.clear();
-      messages.add(ChannelMessage(text: text, sender: irc.client.nickname ?? "You", isMine: true));
+      messages.add(ChannelMessage(
+          text: text, sender: irc.client.nickname ?? "You", isMine: true));
       textFocusNode.requestFocus();
       scrollDown();
     });
@@ -172,9 +198,11 @@ class ChanDetailPageState extends State<ChanDetailPage> {
               onNotification: (notification) {
                 if (notification is ScrollUpdateNotification) {
                   var pos = scrollController.position.pixels;
-                  var distanceToBottom = scrollController.position.maxScrollExtent - pos;
+                  var distanceToBottom =
+                      scrollController.position.maxScrollExtent - pos;
                   setState(() {
-                    showGoToBottomButton = distanceToBottom > SHOW_SCROLLDOWN_BUTTON_UP_BY;
+                    showGoToBottomButton =
+                        distanceToBottom > SHOW_SCROLLDOWN_BUTTON_UP_BY;
                   });
                 }
                 return false;
@@ -187,6 +215,32 @@ class ChanDetailPageState extends State<ChanDetailPage> {
                 padding: const EdgeInsets.only(top: 10, bottom: 100),
                 itemBuilder: (context, index) {
                   var message = messages[index];
+                  var url = findUrlInText(message.text);
+                  if (url != null && _getUrlValid(url)) {
+                    return Column(
+                      children: [
+                        IrcText(message: message),
+                        const SizedBox(height: 25),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                          child: AnyLinkPreview(
+                            link: url,
+                            displayDirection: UIDirection.uiDirectionHorizontal,
+                            showMultimedia: true,
+                            bodyMaxLines: 5,
+                            bodyTextOverflow: TextOverflow.ellipsis,
+                            titleStyle: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                            bodyStyle:
+                                const TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
                   return IrcText(message: message);
                 },
               ),
