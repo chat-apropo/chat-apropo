@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gasconchat/widgets/audioPlayer.dart';
 import 'screens/homePage.dart';
 
 const baseFontSize = 14.0;
@@ -26,13 +27,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'GasconChat',
       // theme: myTheme,
       // darkTheme: darkTheme,
       // themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
-      home: const HomePage(),
+      home: HomePage(),
     );
   }
 }

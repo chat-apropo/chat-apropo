@@ -4,6 +4,9 @@ import '../models/channelMessageModel.dart';
 
 RegExp regIgnoreChars = RegExp(r""",|\.|;|'|@|"|\*|\?|""");
 
+var boldEscape = String.fromCharCode(0x02);
+var italicEscape = String.fromCharCode(0x1D);
+var underlineEscape = String.fromCharCode(0x1F);
 
 class ColorAndSize {
   Color? color;
@@ -13,7 +16,7 @@ class ColorAndSize {
 }
 
 class IrcColors {
-  static var escape = String.fromCharCode(3);
+  static var escape = String.fromCharCode(0x03);
   static const white = "00";
   static const black = "01";
   static const navy = "02";
@@ -120,6 +123,9 @@ class IrcText extends StatelessWidget {
 
     Color? foregroundColor = IrcColors.defaultColor;
     Color? backgroundColor;
+    bool isBold = false;
+    bool isItalic = false;
+    bool isUnderline = false;
     backgroundColor = null;
 
     ColorAndSize getColor(int i) {
@@ -164,13 +170,30 @@ class IrcText extends StatelessWidget {
         continue;
       }
 
+      if (character == boldEscape) {
+        isBold = !isBold;
+        continue;
+      }
+
+      if (character == italicEscape) {
+        isItalic = !isItalic;
+        continue;
+      }
+
+      if (character == underlineEscape) {
+        isUnderline = !isUnderline;
+        continue;
+      }
+
       // Add the text span.
       textSpans.add(TextSpan(
         text: character,
         style: TextStyle(
           color: foregroundColor,
           backgroundColor: backgroundColor,
-          fontWeight: FontWeight.normal,
+          fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+          fontStyle: isItalic ? FontStyle.italic : FontStyle.normal,
+          decoration: isUnderline ? TextDecoration.underline : TextDecoration.none,
           fontSize: 15,
         ),
       ));

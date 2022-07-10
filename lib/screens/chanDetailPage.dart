@@ -4,8 +4,48 @@ import 'package:gasconchat/models/channelMessageModel.dart';
 import 'package:gasconchat/widgets/ircTextMessage.dart';
 import 'package:any_link_preview/any_link_preview.dart';
 
+import '../widgets/audioPlayer.dart';
+
 // Number of pixels to scroll up by to show the go to bottom button
 const SHOW_SCROLLDOWN_BUTTON_UP_BY = 400;
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+const VIDEO_EXTENSIONS = ['mp4', 'mov', 'avi', 'flv', 'wmv', 'mpg', 'mpeg'];
+const AUDIO_EXTENSIONS = ['mp3', 'wav', 'ogg', 'flac', 'aac', 'wma'];
+
+enum UrlType {
+  image,
+  video,
+  audio,
+  other,
+}
+
+bool isDirectlyPreviewable(List<String> extensionList, String url) {
+  return extensionList.contains(url.split('.').last);
+}
+
+bool isImage(String url) {
+  return isDirectlyPreviewable(IMAGE_EXTENSIONS, url);
+}
+
+bool isVideo(String url) {
+  return isDirectlyPreviewable(VIDEO_EXTENSIONS, url);
+}
+
+bool isAudio(String url) {
+  return isDirectlyPreviewable(AUDIO_EXTENSIONS, url);
+}
+
+UrlType getUrlType(String url) {
+  if (isImage(url)) {
+    return UrlType.image;
+  } else if (isVideo(url)) {
+    return UrlType.video;
+  } else if (isAudio(url)) {
+    return UrlType.audio;
+  } else {
+    return UrlType.other;
+  }
+}
 
 String? findUrlInText(String text) {
   final RegExp urlRegExp = RegExp(
@@ -21,8 +61,6 @@ bool _getUrlValid(String url) {
   bool isUrlValid = AnyLinkPreview.isValidLink(
     url,
     protocols: ['http', 'https'],
-    hostWhitelist: ['https://youtube.com/'],
-    hostBlacklist: ['https://facebook.com/'],
   );
   return isUrlValid;
 }
@@ -217,29 +255,51 @@ class ChanDetailPageState extends State<ChanDetailPage> {
                   var message = messages[index];
                   var url = findUrlInText(message.text);
                   if (url != null && _getUrlValid(url)) {
-                    return Column(
-                      children: [
-                        IrcText(message: message),
-                        const SizedBox(height: 25),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                          child: AnyLinkPreview(
-                            link: url,
-                            displayDirection: UIDirection.uiDirectionHorizontal,
-                            showMultimedia: true,
-                            bodyMaxLines: 5,
-                            bodyTextOverflow: TextOverflow.ellipsis,
-                            titleStyle: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
+                    switch (getUrlType(url)) {
+                      case UrlType.audio:
+                        return Column(children: [
+                          IrcText(message: message),
+                          const SizedBox(height: 25),
+                          AudioPlayerWidget(url: url)
+                        ]);
+                      case UrlType.video:
+                        return Column(children: [
+                          IrcText(message: message),
+                          const SizedBox(height: 25),
+                        ]);
+                      case UrlType.image:
+                        return Column(children: [
+                          IrcText(message: message),
+                          const SizedBox(height: 25),
+                          Image.network(url),
+                        ]);
+                      default:
+                        return Column(
+                          children: [
+                            IrcText(message: message),
+                            const SizedBox(height: 25),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 8.0, right: 8.0),
+                              child: AnyLinkPreview(
+                                link: url,
+                                displayDirection:
+                                    UIDirection.uiDirectionHorizontal,
+                                showMultimedia: true,
+                                bodyMaxLines: 5,
+                                bodyTextOverflow: TextOverflow.ellipsis,
+                                titleStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                                bodyStyle: const TextStyle(
+                                    color: Colors.grey, fontSize: 12),
+                              ),
                             ),
-                            bodyStyle:
-                                const TextStyle(color: Colors.grey, fontSize: 12),
-                          ),
-                        ),
-                      ],
-                    );
+                          ],
+                        );
+                    }
                   }
                   return IrcText(message: message);
                 },

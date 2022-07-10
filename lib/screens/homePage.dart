@@ -1,7 +1,9 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:gasconchat/screens/chatPage.dart';
 
 import '../ircClient.dart';
+import '../widgets/audioPlayer.dart';
 import 'chanPage.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,14 +25,23 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    openAudio();
     var client = IrcClient();
     client.connect();
+  }
+
+  Future openAudio() async {
+    await AudioPlayer.global.changeLogLevel(LogLevel.info);
+    var player = AudioPlayer();
+    await player.play(AssetSource("test.mp3"));
+    await player.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     bottomNavbarVisible = MediaQuery.of(context).size.height >
         MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: Row(
         children: [

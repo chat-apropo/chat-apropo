@@ -19,6 +19,9 @@ class IrcClient {
   late Client client;
 
   connect() async {
+    if (connected) {
+      return;
+    }
     client = Client(config);
     connected = true;
 
