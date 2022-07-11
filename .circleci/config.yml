@@ -18,7 +18,7 @@ jobs:
 
       - run: flutter pub get
       - run: flutter build linux --release
-      # - run: flutter build apk --split-per-abi
+      - run: flutter build apk --split-per-abi
       - run:
           name: Github release
           command: bash .circleci/release.sh
