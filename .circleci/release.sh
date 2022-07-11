@@ -5,14 +5,15 @@ wget https://github.com/tcnksm/ghr/releases/download/v0.14.0/ghr_v0.14.0_linux_a
 tar -xvzf ghr_*.tar.gz
 mv ghr_*_amd64 ghr
 
-zip linux_x64.zip build/linux/x64/release/bundle/*
-
+ln -s build/linux/x64/release/bundle/ gasconchat
+zip linux_x64.zip -r gasconchat/*
 
 mkdir -p ghrelease
 mv *.zip ghrelease/
-mv build/app/outputs/apk/release/app-armeabi-v7a-release.apk ghrelease/
-mv build/app/outputs/apk/release/app-arm64-v8a-release.apk ghrelease/
-mv build/app/outputs/apk/release/app-x86_64-release.apk ghrelease/
+
+# mv build/app/outputs/apk/release/app-armeabi-v7a-release.apk ghrelease/
+# mv build/app/outputs/apk/release/app-arm64-v8a-release.apk ghrelease/
+# mv build/app/outputs/apk/release/app-x86_64-release.apk ghrelease/
 
 echo "RELEASE VERSION $VERSION"
 ./ghr/ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./ghrelease/
