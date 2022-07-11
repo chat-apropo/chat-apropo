@@ -65,10 +65,9 @@ bool _getUrlValid(String url) {
   return isUrlValid;
 }
 
-// ignore: must_be_immutable
 class ChanDetailPage extends StatefulWidget {
-  String channel;
-  ChanDetailPage({Key? key, required this.channel}) : super(key: key);
+  final String channel;
+  const ChanDetailPage({Key? key, required this.channel}) : super(key: key);
 
   @override
   ChanDetailPageState createState() => ChanDetailPageState();

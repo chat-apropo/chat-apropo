@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gasconchat/widgets/audioPlayer.dart';
 import 'screens/homePage.dart';
 
 const baseFontSize = 14.0;

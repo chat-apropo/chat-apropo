@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:gasconchat/screens/chatPage.dart';
 
 import '../ircClient.dart';
-import '../widgets/audioPlayer.dart';
 import 'chanPage.dart';
 
 class HomePage extends StatefulWidget {

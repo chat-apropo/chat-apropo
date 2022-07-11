@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import "package:irc/client.dart";
-import "dart:io";
 
 // Singleton irc client
 class IrcClient {
