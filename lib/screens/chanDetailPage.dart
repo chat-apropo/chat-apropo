@@ -234,79 +234,77 @@ class ChanDetailPageState extends State<ChanDetailPage> {
       ),
       body: Stack(
         children: <Widget>[
-          Flexible(
-            child: NotificationListener(
-              onNotification: (notification) {
-                if (notification is ScrollUpdateNotification) {
-                  var pos = scrollController.position.pixels;
-                  var distanceToBottom =
-                      scrollController.position.maxScrollExtent - pos;
-                  setState(() {
-                    showGoToBottomButton =
-                        distanceToBottom > SHOW_SCROLLDOWN_BUTTON_UP_BY;
-                  });
-                }
-                return false;
-              },
-              child: ListView.builder(
-                itemCount: messages.length,
-                shrinkWrap: true,
-                controller: scrollController,
-                physics: const ClampingScrollPhysics(),
-                padding: const EdgeInsets.only(top: 10, bottom: 100),
-                itemBuilder: (context, index) {
-                  var message = messages[index];
-                  var url = findUrlInText(message.text);
-                  if (url != null && _getUrlValid(url)) {
-                    switch (getUrlType(url)) {
-                      case UrlType.audio:
-                        return Column(children: [
+          NotificationListener(
+            onNotification: (notification) {
+              if (notification is ScrollUpdateNotification) {
+                var pos = scrollController.position.pixels;
+                var distanceToBottom =
+                    scrollController.position.maxScrollExtent - pos;
+                setState(() {
+                  showGoToBottomButton =
+                      distanceToBottom > SHOW_SCROLLDOWN_BUTTON_UP_BY;
+                });
+              }
+              return false;
+            },
+            child: ListView.builder(
+              itemCount: messages.length,
+              shrinkWrap: true,
+              controller: scrollController,
+              physics: const ClampingScrollPhysics(),
+              padding: const EdgeInsets.only(top: 10, bottom: 100),
+              itemBuilder: (context, index) {
+                var message = messages[index];
+                var url = findUrlInText(message.text);
+                if (url != null && _getUrlValid(url)) {
+                  switch (getUrlType(url)) {
+                    case UrlType.audio:
+                      return Column(children: [
+                        IrcText(message: message),
+                        const SizedBox(height: 25),
+                        AudioPlayerWidget(url: url)
+                      ]);
+                    case UrlType.video:
+                      return Column(children: [
+                        IrcText(message: message),
+                        const SizedBox(height: 25),
+                      ]);
+                    case UrlType.image:
+                      return Column(children: [
+                        IrcText(message: message),
+                        const SizedBox(height: 25),
+                        Image.network(url),
+                      ]);
+                    default:
+                      return Column(
+                        children: [
                           IrcText(message: message),
                           const SizedBox(height: 25),
-                          AudioPlayerWidget(url: url)
-                        ]);
-                      case UrlType.video:
-                        return Column(children: [
-                          IrcText(message: message),
-                          const SizedBox(height: 25),
-                        ]);
-                      case UrlType.image:
-                        return Column(children: [
-                          IrcText(message: message),
-                          const SizedBox(height: 25),
-                          Image.network(url),
-                        ]);
-                      default:
-                        return Column(
-                          children: [
-                            IrcText(message: message),
-                            const SizedBox(height: 25),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 8.0, right: 8.0),
-                              child: AnyLinkPreview(
-                                link: url,
-                                displayDirection:
-                                    UIDirection.uiDirectionHorizontal,
-                                showMultimedia: true,
-                                bodyMaxLines: 5,
-                                bodyTextOverflow: TextOverflow.ellipsis,
-                                titleStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                                bodyStyle: const TextStyle(
-                                    color: Colors.grey, fontSize: 12),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 8.0, right: 8.0),
+                            child: AnyLinkPreview(
+                              link: url,
+                              displayDirection:
+                                  UIDirection.uiDirectionHorizontal,
+                              showMultimedia: true,
+                              bodyMaxLines: 5,
+                              bodyTextOverflow: TextOverflow.ellipsis,
+                              titleStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
                               ),
+                              bodyStyle: const TextStyle(
+                                  color: Colors.grey, fontSize: 12),
                             ),
-                          ],
-                        );
-                    }
+                          ),
+                        ],
+                      );
                   }
-                  return IrcText(message: message);
-                },
-              ),
+                }
+                return IrcText(message: message);
+              },
             ),
           ),
           Align(
