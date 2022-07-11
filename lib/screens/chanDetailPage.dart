@@ -139,12 +139,18 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     _join();
   }
 
-  void _submit(text) {
+  void _submit(String text) {
+    // if text is whitespace or empty, do nothing
     setState(() {
-      irc.client.sendMessage(widget.channel, text);
-      textField.clear();
-      messages.add(ChannelMessage(
-          text: text, sender: irc.client.nickname ?? "You", isMine: true));
+      if (text.trim().isNotEmpty) {
+        irc.client.sendMessage(widget.channel, text);
+        textField.clear();
+        messages.add(ChannelMessage(
+          text: text,
+          sender: irc.client.nickname ?? "You",
+          isMine: true,
+        ));
+      }
       textFocusNode.requestFocus();
       scrollDown();
     });

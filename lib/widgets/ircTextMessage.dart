@@ -4,9 +4,9 @@ import '../models/channelMessageModel.dart';
 
 RegExp regIgnoreChars = RegExp(r""",|\.|;|'|@|"|\*|\?|""");
 
-var boldEscape = String.fromCharCode(0x02);
-var italicEscape = String.fromCharCode(0x1D);
-var underlineEscape = String.fromCharCode(0x1F);
+const boldEscape = '\x02';
+const italicEscape = '\x1D';
+const underlineEscape = '\x1F';
 
 class ColorAndSize {
   Color? color;
@@ -77,14 +77,14 @@ final List<Color> userColorPallete = <Color>[
   Colors.red[200]!,
 ];
 
-
 class IrcText extends StatelessWidget {
   final ChannelMessage message;
   const IrcText({Key? key, required this.message}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String nickname = message.sender.toLowerCase().replaceAll(regIgnoreChars, "");
+    String nickname =
+        message.sender.toLowerCase().replaceAll(regIgnoreChars, "");
     var color = userColorPallete[nickname.hashCode % userColorPallete.length];
     return Container(
       padding: const EdgeInsets.only(left: 14, right: 14, top: 10, bottom: 10),
@@ -170,33 +170,34 @@ class IrcText extends StatelessWidget {
         continue;
       }
 
-      if (character == boldEscape) {
-        isBold = !isBold;
-        continue;
-      }
+      switch (character) {
+        case boldEscape:
+          isBold = !isBold;
+          break;
 
-      if (character == italicEscape) {
-        isItalic = !isItalic;
-        continue;
-      }
+        case italicEscape:
+          isItalic = !isItalic;
+          break;
 
-      if (character == underlineEscape) {
-        isUnderline = !isUnderline;
-        continue;
-      }
+        case underlineEscape:
+          isUnderline = !isUnderline;
+          break;
 
-      // Add the text span.
-      textSpans.add(TextSpan(
-        text: character,
-        style: TextStyle(
-          color: foregroundColor,
-          backgroundColor: backgroundColor,
-          fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-          fontStyle: isItalic ? FontStyle.italic : FontStyle.normal,
-          decoration: isUnderline ? TextDecoration.underline : TextDecoration.none,
-          fontSize: 15,
-        ),
-      ));
+        default:
+          // Add the text span.
+          textSpans.add(TextSpan(
+            text: character,
+            style: TextStyle(
+              color: foregroundColor,
+              backgroundColor: backgroundColor,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              fontStyle: isItalic ? FontStyle.italic : FontStyle.normal,
+              decoration:
+                  isUnderline ? TextDecoration.underline : TextDecoration.none,
+              fontSize: 15,
+            ),
+          ));
+      }
     }
     return textSpans;
   }
