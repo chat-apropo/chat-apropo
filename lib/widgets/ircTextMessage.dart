@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/channelMessageModel.dart';
+import '../utils.dart';
 
 RegExp regIgnoreChars = RegExp(r""",|\.|;|'|@|"|\*|\?|""");
 
@@ -63,20 +64,6 @@ class IrcColors {
   }
 }
 
-final List<Color> userColorPallete = <Color>[
-  Colors.blue[200]!,
-  Colors.red[200]!,
-  Colors.green[200]!,
-  Colors.orange[200]!,
-  Colors.cyan[200]!,
-  Colors.lightBlue[200]!,
-  Colors.lightGreen[200]!,
-  Colors.purple[200]!,
-  Colors.indigo[200]!,
-  Colors.teal[200]!,
-  Colors.red[200]!,
-];
-
 class IrcText extends StatelessWidget {
   final ChannelMessage message;
   const IrcText({Key? key, required this.message}) : super(key: key);
@@ -85,7 +72,7 @@ class IrcText extends StatelessWidget {
   Widget build(BuildContext context) {
     String nickname =
         message.sender.toLowerCase().replaceAll(regIgnoreChars, "");
-    var color = userColorPallete[nickname.hashCode % userColorPallete.length];
+    var color = nickColor(nickname);
     return Container(
       padding: const EdgeInsets.only(left: 14, right: 14, top: 10, bottom: 10),
       child: Align(

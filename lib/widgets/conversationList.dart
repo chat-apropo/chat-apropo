@@ -7,7 +7,7 @@ import '../screens/chanDetailPage.dart';
 class ConversationList extends StatefulWidget {
   String name;
   String messageText;
-  String image;
+  Color color;
   String time;
   bool isMessageRead;
   bool isChannelList;
@@ -15,7 +15,7 @@ class ConversationList extends StatefulWidget {
     Key? key,
     required this.name,
     required this.messageText,
-    required this.image,
+    required this.color,
     required this.time,
     required this.isMessageRead,
     this.isChannelList = false,
@@ -45,7 +45,7 @@ class ConversationListState extends State<ConversationList> {
               child: Row(
                 children: <Widget>[
                   CircleAvatar(
-                    backgroundImage: NetworkImage(widget.image),
+                    backgroundColor: widget.color,
                     maxRadius: 30,
                   ),
                   const SizedBox(

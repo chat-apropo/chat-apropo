@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/chanModel.dart';
+import '../utils.dart';
 import '../widgets/conversationList.dart';
 
 class ChanPage extends StatefulWidget {
@@ -108,7 +109,7 @@ class _ChanPageState extends State<ChanPage> {
                   name: channels[index].name,
                   isChannelList: true,
                   messageText: channels[index].messageText,
-                  image: channels[index].image,
+                  color: nickColor(channels[index].name),
                   time: channels[index].time,
                   isMessageRead: (index == 0 || index == 3) ? true : false,
                 );
