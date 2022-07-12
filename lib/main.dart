@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     WidgetsFlutterBinding.ensureInitialized();
     return const MaterialApp(
-      title: 'GasconChat',
+      title: 'Chat Apropo',
       // theme: myTheme,
       // darkTheme: darkTheme,
       // themeMode: ThemeMode.dark,

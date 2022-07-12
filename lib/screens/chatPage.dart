@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gasconchat/utils.dart';
+import 'package:chat_apropo/utils.dart';
 
 import '../models/chatUsersModel.dart';
 import '../widgets/conversationList.dart';

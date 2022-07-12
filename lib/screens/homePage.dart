@@ -1,6 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:gasconchat/screens/chatPage.dart';
+import 'package:chat_apropo/screens/chatPage.dart';
 
 import '../ircClient.dart';
 import 'chanPage.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gasconchat/screens/chatDetailPage.dart';
+import 'package:chat_apropo/screens/chatDetailPage.dart';
 
 import '../screens/chanDetailPage.dart';
 

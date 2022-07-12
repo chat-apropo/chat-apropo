@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gasconchat/ircClient.dart';
-import 'package:gasconchat/models/channelMessageModel.dart';
-import 'package:gasconchat/widgets/ircTextMessage.dart';
+import 'package:chat_apropo/ircClient.dart';
+import 'package:chat_apropo/models/channelMessageModel.dart';
+import 'package:chat_apropo/widgets/ircTextMessage.dart';
 import 'package:any_link_preview/any_link_preview.dart';
 
 import '../widgets/uploadFabMenu.dart';

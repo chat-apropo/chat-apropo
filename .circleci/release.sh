@@ -5,8 +5,8 @@ wget https://github.com/tcnksm/ghr/releases/download/v0.14.0/ghr_v0.14.0_linux_a
 tar -xvzf ghr_*.tar.gz
 mv ghr_*_amd64 ghr
 
-ln -s build/linux/x64/release/bundle/ gasconchat
-zip linux_x64.zip -r gasconchat/*
+ln -s build/linux/x64/release/bundle/ chat-apropo
+zip linux_x64.zip -r chat-apropo/*
 
 mkdir -p ghrelease
 mv *.zip ghrelease/
