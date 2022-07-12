@@ -87,8 +87,8 @@ class IrcText extends StatelessWidget {
             ),
           ),
           padding: const EdgeInsets.all(16),
-          child: RichText(
-            text: TextSpan(
+          child: SelectableText.rich(
+            TextSpan(
               text: "${message.sender}\n",
               style: const TextStyle(
                   color: Colors.black,
