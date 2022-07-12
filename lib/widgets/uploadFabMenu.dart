@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gasconchat/utils.dart';
 
 // Taken from  https://github.com/letsdoit07/flutter_animated_fab_menu/blob/master/lib/main.dart
 
@@ -83,93 +84,101 @@ class FabSendMenuState extends State<FabSendMenu>
     return Stack(children: <Widget>[
       IgnorePointer(
         ignoring: !isOpen,
-        child: Container(
-          width: width,
-          height: height,
-          color: darkenAnimation.value,
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.bottomRight,
-            children: <Widget>[
-              Positioned(
-                bottom: bottom,
-                left: left,
-                child: Transform.translate(
-                  offset: Offset.fromDirection(getRadiansFromDegree(0),
-                      degOneTranslationAnimation.value * 100),
-                  child: Transform(
-                    transform: Matrix4.rotationZ(
-                        getRadiansFromDegree(rotationAnimation.value))
-                      ..scale(degOneTranslationAnimation.value),
-                    alignment: Alignment.center,
-                    child: CircularButton(
-                      color: Colors.blueAccent,
-                      width: 50,
-                      height: 50,
-                      icon: const Icon(
-                        Icons.folder,
-                        color: Colors.white,
+        child: GestureDetector(
+          onTap: () {
+            toggleFab();
+          },
+          child: Container(
+            width: width,
+            height: height,
+            color: darkenAnimation.value,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.bottomRight,
+              children: <Widget>[
+                Positioned(
+                  bottom: bottom,
+                  left: left,
+                  child: Transform.translate(
+                    offset: Offset.fromDirection(getRadiansFromDegree(0),
+                        degOneTranslationAnimation.value * 100),
+                    child: Transform(
+                      transform: Matrix4.rotationZ(
+                          getRadiansFromDegree(rotationAnimation.value))
+                        ..scale(degOneTranslationAnimation.value),
+                      alignment: Alignment.center,
+                      child: CircularButton(
+                        color: Colors.blueAccent,
+                        width: 50,
+                        height: 50,
+                        icon: const Icon(
+                          Icons.folder,
+                          color: Colors.white,
+                        ),
+                        onClick: () {
+                          notImplemented(context);
+                          toggleFab();
+                        },
                       ),
-                      onClick: () {
-                        debugPrint('First Button');
-                      },
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                bottom: bottom,
-                left: left,
-                child: Transform.translate(
-                  offset: Offset.fromDirection(getRadiansFromDegree(-45),
-                      degTwoTranslationAnimation.value * 100),
-                  child: Transform(
-                    transform: Matrix4.rotationZ(
-                        getRadiansFromDegree(rotationAnimation.value))
-                      ..scale(degTwoTranslationAnimation.value),
-                    alignment: Alignment.center,
-                    child: CircularButton(
-                      color: Colors.blueAccent,
-                      width: 50,
-                      height: 50,
-                      icon: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
+                Positioned(
+                  bottom: bottom,
+                  left: left,
+                  child: Transform.translate(
+                    offset: Offset.fromDirection(getRadiansFromDegree(-45),
+                        degTwoTranslationAnimation.value * 100),
+                    child: Transform(
+                      transform: Matrix4.rotationZ(
+                          getRadiansFromDegree(rotationAnimation.value))
+                        ..scale(degTwoTranslationAnimation.value),
+                      alignment: Alignment.center,
+                      child: CircularButton(
+                        color: Colors.blueAccent,
+                        width: 50,
+                        height: 50,
+                        icon: const Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                        ),
+                        onClick: () {
+                          notImplemented(context);
+                          toggleFab();
+                        },
                       ),
-                      onClick: () {
-                        debugPrint('Second button');
-                      },
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                bottom: bottom,
-                left: left,
-                child: Transform.translate(
-                  offset: Offset.fromDirection(getRadiansFromDegree(-90),
-                      degThreeTranslationAnimation.value * 100),
-                  child: Transform(
-                    transform: Matrix4.rotationZ(
-                        getRadiansFromDegree(rotationAnimation.value))
-                      ..scale(degThreeTranslationAnimation.value),
-                    alignment: Alignment.center,
-                    child: CircularButton(
-                      color: Colors.blueAccent,
-                      width: 50,
-                      height: 50,
-                      icon: const Icon(
-                        Icons.mic,
-                        color: Colors.white,
+                Positioned(
+                  bottom: bottom,
+                  left: left,
+                  child: Transform.translate(
+                    offset: Offset.fromDirection(getRadiansFromDegree(-90),
+                        degThreeTranslationAnimation.value * 100),
+                    child: Transform(
+                      transform: Matrix4.rotationZ(
+                          getRadiansFromDegree(rotationAnimation.value))
+                        ..scale(degThreeTranslationAnimation.value),
+                      alignment: Alignment.center,
+                      child: CircularButton(
+                        color: Colors.blueAccent,
+                        width: 50,
+                        height: 50,
+                        icon: const Icon(
+                          Icons.mic,
+                          color: Colors.white,
+                        ),
+                        onClick: () {
+                          notImplemented(context);
+                          toggleFab();
+                        },
                       ),
-                      onClick: () {
-                        debugPrint('Third Button');
-                      },
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -181,16 +190,7 @@ class FabSendMenuState extends State<FabSendMenu>
               Matrix4.rotationZ(getRadiansFromDegree(rotationAnimation.value)),
           alignment: Alignment.center,
           child: GestureDetector(
-            onTap: () {
-              if (animationController.isCompleted) {
-                isOpen = false;
-                animationController.reverse();
-              } else {
-                isOpen = true;
-                animationController.forward();
-              }
-              widget.onToggle(isOpen);
-            },
+            onTap: toggleFab,
             child: Container(
               height: 30,
               width: 30,
@@ -211,6 +211,21 @@ class FabSendMenuState extends State<FabSendMenu>
         ),
       ),
     ]);
+  }
+
+  void toggleFab() {
+    if (animationController.isCompleted) {
+      isOpen = false;
+      animationController.reverse();
+    } else {
+      isOpen = true;
+      animationController.forward();
+    }
+    widget.onToggle(isOpen);
+  }
+
+  void notImplemented(context) {
+    showToast(context, 'Not Implemented', 2);
   }
 }
 

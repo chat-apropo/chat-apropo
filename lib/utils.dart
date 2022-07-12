@@ -17,3 +17,10 @@ final List<Color> userColorPallete = <Color>[
 Color nickColor(String nick) {
   return userColorPallete[nick.hashCode % userColorPallete.length];
 }
+
+void showToast(BuildContext context, String message, [int time = 3]) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Text(message),
+    duration: Duration(seconds: time),
+  ));
+}
