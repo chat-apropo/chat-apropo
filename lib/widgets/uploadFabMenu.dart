@@ -2,21 +2,30 @@ import 'package:flutter/material.dart';
 
 // Taken from  https://github.com/letsdoit07/flutter_animated_fab_menu/blob/master/lib/main.dart
 
-class SendFabMenu extends StatefulWidget {
+class FabSendMenu extends StatefulWidget {
   final Function(bool) onToggle;
-  const SendFabMenu({Key? key, required this.onToggle}) : super(key: key);
+  final double bottom;
+  final double left;
+  const FabSendMenu({
+    Key? key,
+    required this.onToggle,
+    this.bottom = 0,
+    this.left = 0,
+  }) : super(key: key);
 
   @override
-  SendFabMenuState createState() => SendFabMenuState();
+  FabSendMenuState createState() => FabSendMenuState();
 }
 
-class SendFabMenuState extends State<SendFabMenu>
+class FabSendMenuState extends State<FabSendMenu>
     with SingleTickerProviderStateMixin {
+  bool isOpen = false;
   late AnimationController animationController;
   late Animation degOneTranslationAnimation,
       degTwoTranslationAnimation,
       degThreeTranslationAnimation;
   late Animation rotationAnimation;
+  late Animation<Color?> darkenAnimation;
 
   double getRadiansFromDegree(double degree) {
     double unitRadian = 57.295779513;
@@ -53,6 +62,12 @@ class SendFabMenuState extends State<SendFabMenu>
     ]).animate(animationController);
     rotationAnimation = Tween<double>(begin: 180.0, end: 0.0).animate(
         CurvedAnimation(parent: animationController, curve: Curves.easeOut));
+
+    darkenAnimation = ColorTween(
+      begin: Colors.black.withOpacity(0.0),
+      end: Colors.black.withOpacity(0.6),
+    ).animate(animationController);
+
     super.initState();
     animationController.addListener(() {
       setState(() {});
@@ -61,88 +76,120 @@ class SendFabMenuState extends State<SendFabMenu>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.bottomRight,
-      children: <Widget>[
-        Transform.translate(
-          offset: Offset.fromDirection(
-              getRadiansFromDegree(0), degOneTranslationAnimation.value * 100),
-          child: Transform(
-            transform:
-                Matrix4.rotationZ(getRadiansFromDegree(rotationAnimation.value))
-                  ..scale(degOneTranslationAnimation.value),
-            alignment: Alignment.center,
-            child: CircularButton(
-              color: Colors.blueAccent,
-              width: 50,
-              height: 50,
-              icon: const Icon(
-                Icons.folder,
-                color: Colors.white,
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    var bottom = widget.bottom;
+    var left = widget.left;
+    return Stack(children: <Widget>[
+      IgnorePointer(
+        ignoring: !isOpen,
+        child: Container(
+          width: width,
+          height: height,
+          color: darkenAnimation.value,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.bottomRight,
+            children: <Widget>[
+              Positioned(
+                bottom: bottom,
+                left: left,
+                child: Transform.translate(
+                  offset: Offset.fromDirection(getRadiansFromDegree(0),
+                      degOneTranslationAnimation.value * 100),
+                  child: Transform(
+                    transform: Matrix4.rotationZ(
+                        getRadiansFromDegree(rotationAnimation.value))
+                      ..scale(degOneTranslationAnimation.value),
+                    alignment: Alignment.center,
+                    child: CircularButton(
+                      color: Colors.blueAccent,
+                      width: 50,
+                      height: 50,
+                      icon: const Icon(
+                        Icons.folder,
+                        color: Colors.white,
+                      ),
+                      onClick: () {
+                        debugPrint('First Button');
+                      },
+                    ),
+                  ),
+                ),
               ),
-              onClick: () {
-                debugPrint('First Button');
-              },
-            ),
+              Positioned(
+                bottom: bottom,
+                left: left,
+                child: Transform.translate(
+                  offset: Offset.fromDirection(getRadiansFromDegree(-45),
+                      degTwoTranslationAnimation.value * 100),
+                  child: Transform(
+                    transform: Matrix4.rotationZ(
+                        getRadiansFromDegree(rotationAnimation.value))
+                      ..scale(degTwoTranslationAnimation.value),
+                    alignment: Alignment.center,
+                    child: CircularButton(
+                      color: Colors.blueAccent,
+                      width: 50,
+                      height: 50,
+                      icon: const Icon(
+                        Icons.camera_alt,
+                        color: Colors.white,
+                      ),
+                      onClick: () {
+                        debugPrint('Second button');
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: bottom,
+                left: left,
+                child: Transform.translate(
+                  offset: Offset.fromDirection(getRadiansFromDegree(-90),
+                      degThreeTranslationAnimation.value * 100),
+                  child: Transform(
+                    transform: Matrix4.rotationZ(
+                        getRadiansFromDegree(rotationAnimation.value))
+                      ..scale(degThreeTranslationAnimation.value),
+                    alignment: Alignment.center,
+                    child: CircularButton(
+                      color: Colors.blueAccent,
+                      width: 50,
+                      height: 50,
+                      icon: const Icon(
+                        Icons.mic,
+                        color: Colors.white,
+                      ),
+                      onClick: () {
+                        debugPrint('Third Button');
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        Transform.translate(
-          offset: Offset.fromDirection(getRadiansFromDegree(-45),
-              degTwoTranslationAnimation.value * 100),
-          child: Transform(
-            transform:
-                Matrix4.rotationZ(getRadiansFromDegree(rotationAnimation.value))
-                  ..scale(degTwoTranslationAnimation.value),
-            alignment: Alignment.center,
-            child: CircularButton(
-              color: Colors.blueAccent,
-              width: 50,
-              height: 50,
-              icon: const Icon(
-                Icons.camera_alt,
-                color: Colors.white,
-              ),
-              onClick: () {
-                debugPrint('Second button');
-              },
-            ),
-          ),
-        ),
-        Transform.translate(
-          offset: Offset.fromDirection(getRadiansFromDegree(-90),
-              degThreeTranslationAnimation.value * 100),
-          child: Transform(
-            transform:
-                Matrix4.rotationZ(getRadiansFromDegree(rotationAnimation.value))
-                  ..scale(degThreeTranslationAnimation.value),
-            alignment: Alignment.center,
-            child: CircularButton(
-              color: Colors.blueAccent,
-              width: 50,
-              height: 50,
-              icon: const Icon(
-                Icons.mic,
-                color: Colors.white,
-              ),
-              onClick: () {
-                debugPrint('Third Button');
-              },
-            ),
-          ),
-        ),
-        Transform(
+      ),
+      Positioned(
+        bottom: bottom,
+        left: left,
+        child: Transform(
           transform:
               Matrix4.rotationZ(getRadiansFromDegree(rotationAnimation.value)),
           alignment: Alignment.center,
           child: GestureDetector(
             onTap: () {
               if (animationController.isCompleted) {
-                widget.onToggle(false);
+                isOpen = false;
                 animationController.reverse();
               } else {
-                widget.onToggle(true);
+                isOpen = true;
                 animationController.forward();
               }
+              widget.onToggle(isOpen);
             },
             child: Container(
               height: 30,
@@ -162,8 +209,8 @@ class SendFabMenuState extends State<SendFabMenu>
             ),
           ),
         ),
-      ],
-    );
+      ),
+    ]);
   }
 }
 

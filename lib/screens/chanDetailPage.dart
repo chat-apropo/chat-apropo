@@ -170,9 +170,12 @@ class ChanDetailPageState extends State<ChanDetailPage> {
         visible: showGoToBottomButton,
         child: Padding(
           padding: const EdgeInsets.only(bottom: 120.0),
-          child: FloatingActionButton(
-            onPressed: scrollDown,
-            child: const Icon(Icons.arrow_downward),
+          child: Visibility(
+            visible: !isSendMenuVisible,
+            child: FloatingActionButton(
+              onPressed: scrollDown,
+              child: const Icon(Icons.arrow_downward),
+            ),
           ),
         ),
       ),
@@ -235,81 +238,79 @@ class ChanDetailPageState extends State<ChanDetailPage> {
         ),
       ),
       body: Stack(
+        clipBehavior: Clip.none,
         children: <Widget>[
-          IgnorePointer(
-            ignoring: isSendMenuVisible,
-            child: NotificationListener(
-              onNotification: (notification) {
-                if (notification is ScrollUpdateNotification) {
-                  var pos = scrollController.position.pixels;
-                  var distanceToBottom =
-                      scrollController.position.maxScrollExtent - pos;
-                  setState(() {
-                    showGoToBottomButton =
-                        distanceToBottom > SHOW_SCROLLDOWN_BUTTON_UP_BY;
-                  });
-                }
-                return false;
-              },
-              child: ListView.builder(
-                itemCount: messages.length,
-                shrinkWrap: true,
-                controller: scrollController,
-                physics: const ClampingScrollPhysics(),
-                padding: const EdgeInsets.only(top: 10, bottom: 100),
-                itemBuilder: (context, index) {
-                  var message = messages[index];
-                  var url = findUrlInText(message.text);
-                  if (url != null && _getUrlValid(url)) {
-                    switch (getUrlType(url)) {
-                      case UrlType.audio:
-                        return Column(children: [
+          NotificationListener(
+            onNotification: (notification) {
+              if (notification is ScrollUpdateNotification) {
+                var pos = scrollController.position.pixels;
+                var distanceToBottom =
+                    scrollController.position.maxScrollExtent - pos;
+                setState(() {
+                  showGoToBottomButton =
+                      distanceToBottom > SHOW_SCROLLDOWN_BUTTON_UP_BY;
+                });
+              }
+              return false;
+            },
+            child: ListView.builder(
+              itemCount: messages.length,
+              shrinkWrap: true,
+              controller: scrollController,
+              physics: const ClampingScrollPhysics(),
+              padding: const EdgeInsets.only(top: 10, bottom: 100),
+              itemBuilder: (context, index) {
+                var message = messages[index];
+                var url = findUrlInText(message.text);
+                if (url != null && _getUrlValid(url)) {
+                  switch (getUrlType(url)) {
+                    case UrlType.audio:
+                      return Column(children: [
+                        IrcText(message: message),
+                        const SizedBox(height: 25),
+                        AudioPlayerWidget(url: url)
+                      ]);
+                    case UrlType.video:
+                      return Column(children: [
+                        IrcText(message: message),
+                        const SizedBox(height: 25),
+                      ]);
+                    case UrlType.image:
+                      return Column(children: [
+                        IrcText(message: message),
+                        const SizedBox(height: 25),
+                        Image.network(url),
+                      ]);
+                    default:
+                      return Column(
+                        children: [
                           IrcText(message: message),
                           const SizedBox(height: 25),
-                          AudioPlayerWidget(url: url)
-                        ]);
-                      case UrlType.video:
-                        return Column(children: [
-                          IrcText(message: message),
-                          const SizedBox(height: 25),
-                        ]);
-                      case UrlType.image:
-                        return Column(children: [
-                          IrcText(message: message),
-                          const SizedBox(height: 25),
-                          Image.network(url),
-                        ]);
-                      default:
-                        return Column(
-                          children: [
-                            IrcText(message: message),
-                            const SizedBox(height: 25),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 8.0, right: 8.0),
-                              child: AnyLinkPreview(
-                                link: url,
-                                displayDirection:
-                                    UIDirection.uiDirectionHorizontal,
-                                showMultimedia: true,
-                                bodyMaxLines: 5,
-                                bodyTextOverflow: TextOverflow.ellipsis,
-                                titleStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                                bodyStyle: const TextStyle(
-                                    color: Colors.grey, fontSize: 12),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 8.0, right: 8.0),
+                            child: AnyLinkPreview(
+                              link: url,
+                              displayDirection:
+                                  UIDirection.uiDirectionHorizontal,
+                              showMultimedia: true,
+                              bodyMaxLines: 5,
+                              bodyTextOverflow: TextOverflow.ellipsis,
+                              titleStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
                               ),
+                              bodyStyle: const TextStyle(
+                                  color: Colors.grey, fontSize: 12),
                             ),
-                          ],
-                        );
-                    }
+                          ),
+                        ],
+                      );
                   }
-                  return IrcText(message: message);
-                },
-              ),
+                }
+                return IrcText(message: message);
+              },
             ),
           ),
           Align(
@@ -321,19 +322,11 @@ class ChanDetailPageState extends State<ChanDetailPage> {
               color: Colors.white,
               child: Row(
                 children: <Widget>[
-                  SendFabMenu(
-                    onToggle: (bool isOpen) {
-                      setState(() {
-                        isSendMenuVisible = isOpen;
-                      });
-                    },
-                  ),
                   const SizedBox(
-                    width: 15,
+                    width: 60,
                   ),
                   Expanded(
                     child: TextField(
-                      enabled: !isSendMenuVisible,
                       controller: textField,
                       autofocus: true,
                       focusNode: textFocusNode,
@@ -347,23 +340,33 @@ class ChanDetailPageState extends State<ChanDetailPage> {
                   const SizedBox(
                     width: 15,
                   ),
-                  IgnorePointer(
-                    ignoring: isSendMenuVisible,
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        _submit(textField.text);
-                      },
-                      backgroundColor: Colors.blue,
-                      elevation: 0,
-                      child: const Icon(
-                        Icons.send,
-                        color: Colors.white,
-                        size: 18,
-                      ),
+                  FloatingActionButton(
+                    onPressed: () {
+                      _submit(textField.text);
+                    },
+                    backgroundColor: Colors.blue,
+                    elevation: 0,
+                    child: const Icon(
+                      Icons.send,
+                      color: Colors.white,
+                      size: 18,
                     ),
                   ),
                 ],
               ),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            child: FabSendMenu(
+              bottom: 15,
+              left: 25,
+              onToggle: (bool isOpen) {
+                setState(() {
+                  isSendMenuVisible = isOpen;
+                });
+              },
             ),
           ),
         ],
