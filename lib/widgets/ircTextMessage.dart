@@ -83,7 +83,7 @@ class IrcText extends StatelessWidget {
             color: (!message.isMine ? Colors.grey[200] : Colors.blue[200]),
             border: Border.all(
               color: color,
-              width: (message.isMine ? 0 : 2),
+              width: (message.isMine ? 0 : 3),
             ),
           ),
           padding: const EdgeInsets.all(16),

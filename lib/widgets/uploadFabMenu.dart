@@ -96,86 +96,44 @@ class FabSendMenuState extends State<FabSendMenu>
               clipBehavior: Clip.none,
               alignment: Alignment.bottomRight,
               children: <Widget>[
-                Positioned(
-                  bottom: bottom,
-                  left: left,
-                  child: Transform.translate(
-                    offset: Offset.fromDirection(getRadiansFromDegree(0),
-                        degOneTranslationAnimation.value * 100),
-                    child: Transform(
-                      transform: Matrix4.rotationZ(
-                          getRadiansFromDegree(rotationAnimation.value))
-                        ..scale(degOneTranslationAnimation.value),
-                      alignment: Alignment.center,
-                      child: CircularButton(
-                        color: Colors.blueAccent,
-                        width: 50,
-                        height: 50,
-                        icon: const Icon(
-                          Icons.folder,
-                          color: Colors.white,
-                        ),
-                        onClick: () {
-                          notImplemented(context);
-                          toggleFab();
-                        },
-                      ),
-                    ),
+                buildMenuButton(
+                  context,
+                  degOneTranslationAnimation,
+                  0,
+                  const Icon(
+                    Icons.folder,
+                    color: Colors.white,
                   ),
+                  () {
+                    notImplemented(context);
+                    toggleFab();
+                  },
                 ),
-                Positioned(
-                  bottom: bottom,
-                  left: left,
-                  child: Transform.translate(
-                    offset: Offset.fromDirection(getRadiansFromDegree(-45),
-                        degTwoTranslationAnimation.value * 100),
-                    child: Transform(
-                      transform: Matrix4.rotationZ(
-                          getRadiansFromDegree(rotationAnimation.value))
-                        ..scale(degTwoTranslationAnimation.value),
-                      alignment: Alignment.center,
-                      child: CircularButton(
-                        color: Colors.blueAccent,
-                        width: 50,
-                        height: 50,
-                        icon: const Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                        ),
-                        onClick: () {
-                          notImplemented(context);
-                          toggleFab();
-                        },
-                      ),
-                    ),
+                buildMenuButton(
+                  context,
+                  degTwoTranslationAnimation,
+                  -45,
+                  const Icon(
+                    Icons.camera_alt,
+                    color: Colors.white,
                   ),
+                  () {
+                    notImplemented(context);
+                    toggleFab();
+                  },
                 ),
-                Positioned(
-                  bottom: bottom,
-                  left: left,
-                  child: Transform.translate(
-                    offset: Offset.fromDirection(getRadiansFromDegree(-90),
-                        degThreeTranslationAnimation.value * 100),
-                    child: Transform(
-                      transform: Matrix4.rotationZ(
-                          getRadiansFromDegree(rotationAnimation.value))
-                        ..scale(degThreeTranslationAnimation.value),
-                      alignment: Alignment.center,
-                      child: CircularButton(
-                        color: Colors.blueAccent,
-                        width: 50,
-                        height: 50,
-                        icon: const Icon(
-                          Icons.mic,
-                          color: Colors.white,
-                        ),
-                        onClick: () {
-                          notImplemented(context);
-                          toggleFab();
-                        },
-                      ),
-                    ),
+                buildMenuButton(
+                  context,
+                  degThreeTranslationAnimation,
+                  -90,
+                  const Icon(
+                    Icons.mic,
+                    color: Colors.white,
                   ),
+                  () {
+                    notImplemented(context);
+                    toggleFab();
+                  },
                 ),
               ],
             ),
@@ -211,6 +169,33 @@ class FabSendMenuState extends State<FabSendMenu>
         ),
       ),
     ]);
+  }
+
+  Positioned buildMenuButton(
+      BuildContext context, Animation animation, double angle, Icon icon, Function()? onClick) {
+    var bottom = widget.bottom;
+    var left = widget.left;
+    return Positioned(
+      bottom: bottom,
+      left: left,
+      child: Transform.translate(
+        offset: Offset.fromDirection(getRadiansFromDegree(angle),
+            animation.value * 100),
+        child: Transform(
+          transform:
+              Matrix4.rotationZ(getRadiansFromDegree(rotationAnimation.value))
+                ..scale(animation.value),
+          alignment: Alignment.center,
+          child: CircularButton(
+            color: Colors.blueAccent,
+            width: 50,
+            height: 50,
+            icon: icon,
+            onClick: onClick,
+          ),
+        ),
+      ),
+    );
   }
 
   void toggleFab() {
