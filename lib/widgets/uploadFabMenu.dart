@@ -1,15 +1,65 @@
+import 'dart:io';
+import 'package:dio/dio.dart' as dio;
+import 'package:http_parser/http_parser.dart';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gasconchat/utils.dart';
+
+enum FailReason {
+  fileTooLarge,
+  requestFailed,
+}
+
+String basename(File file) {
+  String path = file.path;
+  return path.substring(path.lastIndexOf('/') + 1);
+}
+
+Future<String?> ttmUpload(Function(FailReason)? onFail, File file) async {
+  // If size is greater than 256mb then return null
+  if (file.lengthSync() > 256 * 1024 * 1024) {
+    onFail?.call(FailReason.fileTooLarge);
+    return null;
+  }
+  const url = 'http://ttm.sh';
+  try {
+    var dioRequest = dio.Dio();
+    dioRequest.options.baseUrl = url;
+    dioRequest.options.headers = {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    };
+
+    var fileForm = await dio.MultipartFile.fromFile(file.path,
+        filename: basename(file),
+        contentType: MediaType("file", basename(file)));
+
+    var formData = dio.FormData();
+    formData.files.add(MapEntry('file', fileForm));
+
+    var response = await dioRequest.post(
+      url,
+      data: formData,
+    );
+    return response.toString();
+  } catch (e) {
+    debugPrint(e.toString());
+    onFail?.call(FailReason.requestFailed);
+    return null;
+  }
+}
 
 // Taken from  https://github.com/letsdoit07/flutter_animated_fab_menu/blob/master/lib/main.dart
 
 class FabSendMenu extends StatefulWidget {
   final Function(bool) onToggle;
+  final Function(String) onSend;
   final double bottom;
   final double left;
   const FabSendMenu({
     Key? key,
     required this.onToggle,
+    required this.onSend,
     this.bottom = 0,
     this.left = 0,
   }) : super(key: key);
@@ -104,8 +154,29 @@ class FabSendMenuState extends State<FabSendMenu>
                     Icons.folder,
                     color: Colors.white,
                   ),
-                  () {
-                    notImplemented(context);
+                  () async {
+                    FilePickerResult? result =
+                        await FilePicker.platform.pickFiles();
+
+                    if (result != null) {
+                      File file = File(result.files.single.path!);
+                      var url = await ttmUpload(
+                        (fail) {
+                          switch (fail) {
+                            case FailReason.fileTooLarge:
+                              showToast(context, 'Failed! File is too big!');
+                              break;
+                            case FailReason.requestFailed:
+                              showToast(context, 'Request failed.');
+                              break;
+                          }
+                        },
+                        file,
+                      );
+                      if (url != null) {
+                        widget.onSend(url);
+                      }
+                    }
                     toggleFab();
                   },
                 ),
@@ -171,16 +242,16 @@ class FabSendMenuState extends State<FabSendMenu>
     ]);
   }
 
-  Positioned buildMenuButton(
-      BuildContext context, Animation animation, double angle, Icon icon, Function()? onClick) {
+  Positioned buildMenuButton(BuildContext context, Animation animation,
+      double angle, Icon icon, Function()? onClick) {
     var bottom = widget.bottom;
     var left = widget.left;
     return Positioned(
       bottom: bottom,
       left: left,
       child: Transform.translate(
-        offset: Offset.fromDirection(getRadiansFromDegree(angle),
-            animation.value * 100),
+        offset: Offset.fromDirection(
+            getRadiansFromDegree(angle), animation.value * 100),
         child: Transform(
           transform:
               Matrix4.rotationZ(getRadiansFromDegree(rotationAnimation.value))

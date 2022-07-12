@@ -367,6 +367,9 @@ class ChanDetailPageState extends State<ChanDetailPage> {
                   isSendMenuVisible = isOpen;
                 });
               },
+              onSend: (String text) {
+                _submit(text);
+              },
             ),
           ),
         ],
