@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.chatapropo">
+    package="com.example.chat_apropo">
    <application
         android:label="chat_apropo"
         android:name="${applicationName}"
