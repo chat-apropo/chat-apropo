@@ -1,6 +1,6 @@
 {
-    "name": "gasconchat",
-    "short_name": "gasconchat",
+    "name": "chat_apropo",
+    "short_name": "chat_apropo",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
