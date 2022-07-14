@@ -30,6 +30,7 @@ void main() {
   }
   databaseFactory = databaseFactoryFfi;
   ensureDatabaseCreated();
+  DbHelper().open();
   runApp(const App());
 }
 

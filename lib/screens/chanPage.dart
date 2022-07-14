@@ -1,3 +1,4 @@
+import 'package:chat_apropo/models/channelMessageModel.dart';
 import 'package:flutter/material.dart';
 
 import '../models/chanModel.dart';
@@ -13,23 +14,54 @@ class ChanPage extends StatefulWidget {
 }
 
 class _ChanPageState extends State<ChanPage> {
-  List<Channels> channels = [
-    Channels(
-        name: "#romanian",
-        messageText: "Last message here",
-        image: "images/userImage1.jpeg",
-        time: "Now"),
-    Channels(
-        name: "#bots",
-        messageText: "Last message here",
-        image: "images/userImage2.jpeg",
-        time: "Yesterday"),
-    Channels(
-        name: "#radio",
-        messageText: "Last message here",
-        image: "images/userImage3.jpeg",
-        time: "31 Mar"),
+  List<Channel> channels = [
+    Channel(
+      name: "#romanian",
+      lastMessage: ChannelMessage(
+          text: "Last message here",
+          sender: "John",
+          timestamp: DateTime.now(),
+          isMine: false),
+    ),
+    Channel(
+      name: "#bots",
+      lastMessage: ChannelMessage(
+          text: "Last message here",
+          sender: "John",
+          timestamp: DateTime.now(),
+          isMine: false),
+    ),
+    Channel(
+      name: "#radio",
+      lastMessage: ChannelMessage(
+          text: "Last message here",
+          sender: "John",
+          timestamp: DateTime.now(),
+          isMine: false),
+    ),
   ];
+
+  /// Returns "Now" if in the last 10 minutes, otherwise the hour if on the same day
+  /// otherwise the day and the month if in the same year, otherwise day month year
+  String _datetimeToString(DateTime dateTime) {
+    final now = DateTime.now();
+    // Format to 2 digits
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final day = dateTime.day.toString().padLeft(2, '0');
+    final month = dateTime.month.toString().padLeft(2, '0');
+
+    if (dateTime.difference(now).inMinutes < 10) {
+      return "Now";
+    } else if (dateTime.day == now.day) {
+      return "$hour:$minute";
+    } else if (dateTime.year == now.year) {
+      return "$day/$month $hour:$minute";
+    } else {
+      return "$day/$month/${dateTime.year} $hour:$minute";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,9 +140,9 @@ class _ChanPageState extends State<ChanPage> {
                 return ConversationList(
                   name: channels[index].name,
                   isChannelList: true,
-                  messageText: channels[index].messageText,
+                  messageText: channels[index].lastMessage.text,
                   color: nickColor(channels[index].name),
-                  time: channels[index].time,
+                  time: _datetimeToString(channels[index].lastMessage.date),
                   isMessageRead: (index == 0 || index == 3) ? true : false,
                 );
               },

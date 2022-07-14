@@ -1,12 +1,10 @@
-class Channels {
+import 'package:chat_apropo/models/channelMessageModel.dart';
+
+class Channel {
   String name;
-  String messageText;
-  String image;
-  String time;
-  Channels({
+  ChannelMessage lastMessage;
+  Channel({
       required this.name,
-      required this.messageText,
-      required this.image,
-      required this.time
+      required this.lastMessage,
   });
 }
