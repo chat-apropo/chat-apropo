@@ -1,4 +1,9 @@
+import 'dart:io';
+
+import 'package:chat_apropo/models/dbhelpers.dart';
 import 'package:flutter/material.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'screens/homePage.dart';
 
@@ -19,6 +24,12 @@ final ThemeData darkTheme = ThemeData(
   textTheme: textTheme);
 
 void main() {
+  if (Platform.isWindows || Platform.isLinux) {
+    // Initialize FFI
+    sqfliteFfiInit();
+  }
+  databaseFactory = databaseFactoryFfi;
+  ensureDatabaseCreated();
   runApp(const App());
 }
 
