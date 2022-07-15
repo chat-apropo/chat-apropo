@@ -1,3 +1,4 @@
+import 'package:chat_apropo/models/dbhelpers.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_apropo/ircClient.dart';
 import 'package:chat_apropo/models/channelMessageModel.dart';
@@ -78,6 +79,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
   List<ChannelMessage> messages = [];
 
   var irc = IrcClient();
+  final dbHelper = DbHelper();
   bool showGoToBottomButton = false;
   final textField = TextEditingController();
   final textFocusNode = FocusNode();
@@ -117,14 +119,16 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     });
 
     // Message arrived
-    irc.client.onMessage.listen((event) {
+    irc.client.onMessage.listen((event) async {
       debugPrint(
           "<${event.target!.name}><${event.from?.name}> ${event.message}");
 
+      var message = ChannelMessage(
+          text: event.message ?? "", sender: event.from?.name ?? "--");
+      await dbHelper.insertMessage(widget.channel, message);
       setState(() {
         if (event.target?.name == widget.channel) {
-          messages.add(ChannelMessage(
-              text: event.message ?? "", sender: event.from?.name ?? "--"));
+          messages.add(message);
 
           var pos = scrollController.position.pixels;
           var distanceToBottom =
@@ -140,21 +144,23 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     _join();
   }
 
-  void _submit(String text) {
+  Future _submit(String text) async {
     // if text is whitespace or empty, do nothing
-    setState(() {
-      if (text.trim().isNotEmpty) {
-        irc.client.sendMessage(widget.channel, text);
-        textField.clear();
-        messages.add(ChannelMessage(
-          text: text,
-          sender: irc.client.nickname ?? "You",
-          isMine: true,
-        ));
-      }
+    if (text.trim().isNotEmpty) {
+      irc.client.sendMessage(widget.channel, text);
+      textField.clear();
+      var message = ChannelMessage(
+        text: text,
+        sender: irc.client.nickname ?? "You",
+        isMine: true,
+      );
+      messages.add(message);
+      setState(() {});
       textFocusNode.requestFocus();
-      scrollDown();
-    });
+
+      await dbHelper.insertMessage(widget.channel, message, true);
+    }
+    scrollDown();
   }
 
   @override

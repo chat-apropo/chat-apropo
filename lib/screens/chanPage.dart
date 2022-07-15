@@ -43,7 +43,10 @@ class _ChanPageState extends State<ChanPage> {
 
   /// Returns "Now" if in the last 10 minutes, otherwise the hour if on the same day
   /// otherwise the day and the month if in the same year, otherwise day month year
-  String _datetimeToString(DateTime dateTime) {
+  String _datetimeToString(DateTime? dateTime) {
+    if (dateTime == null) {
+      return "";
+    }
     final now = DateTime.now();
     // Format to 2 digits
     final minute = dateTime.minute.toString().padLeft(2, '0');
@@ -140,9 +143,9 @@ class _ChanPageState extends State<ChanPage> {
                 return ConversationList(
                   name: channels[index].name,
                   isChannelList: true,
-                  messageText: channels[index].lastMessage.text,
+                  messageText: channels[index].lastMessage?.text ?? "",
                   color: nickColor(channels[index].name),
-                  time: _datetimeToString(channels[index].lastMessage.date),
+                  time: _datetimeToString(channels[index].lastMessage?.date),
                   isMessageRead: (index == 0 || index == 3) ? true : false,
                 );
               },
