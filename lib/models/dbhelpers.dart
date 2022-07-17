@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chat_apropo/models/chanModel.dart';
 import 'package:chat_apropo/models/channelMessageModel.dart';
 import 'package:flutter/widgets.dart';
@@ -6,6 +8,18 @@ import 'package:sqflite/sqflite.dart';
 
 const dbFilename = 'messages.db';
 const dbVersion = 1;
+
+enum Theme { light, dark, system }
+
+/// Config data class
+class Config {
+  final Theme theme;
+  final String language;
+  const Config({
+    required this.theme,
+    required this.language,
+  });
+}
 
 Future createMessageTables(db, version) async {
   await db.execute('''
@@ -26,7 +40,21 @@ Future createMessageTables(db, version) async {
       channelId INTEGER NOT NULL,
       FOREIGN KEY (channelId) REFERENCES channels(id)
     );
+    CREATE TABLE IF NOT EXISTS config (
+      id INTEGER PRIMARY KEY,
+      language TEXT NOT NULL,
+      theme INTEGER NOT NULL
+    );
   ''');
+
+  final String defaultLocale = Platform.localeName.split('_').first;
+  debugPrint("System language: $defaultLocale");
+  await db.rawInsert(
+    '''
+    INSERT INTO config (language, theme) VALUES (?, ?);
+  ''',
+    [defaultLocale, Theme.system.index],
+  );
 }
 
 /// Creates the database if it doesn't exist.
@@ -105,6 +133,25 @@ class DbHelper {
       version: dbVersion,
       onCreate: createMessageTables,
     );
+  }
+
+  /// Return config Map
+  Future<Config> getConfig() async {
+    final db = _db!;
+    final Map<String, dynamic> config = (await db.query('config')).first;
+    return Config(
+      theme: Theme.values[config['theme']],
+      language: config['language'],
+    );
+  }
+
+  /// Update config Map
+  Future<void> updateConfig(Config config) async {
+    final db = _db!;
+    await db.update('config', {
+      'language': config.language,
+      'theme': config.theme.index,
+    });
   }
 
   /// Inserts a new channel

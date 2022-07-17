@@ -1,3 +1,4 @@
+import 'package:chat_apropo/i18n.dart';
 import 'package:chat_apropo/models/dbhelpers.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_apropo/ircClient.dart';
@@ -114,7 +115,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     irc.client.onClientJoin.listen((event) {
       setState(() {
         messages.add(
-            ChannelMessage(text: "JOINED CHANNEL", sender: widget.channel));
+            ChannelMessage(text: "JOINED CHANNEL".i18n, sender: widget.channel));
       });
     });
 

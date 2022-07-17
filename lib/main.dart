@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'i18n.dart';
 import 'screens/homePage.dart';
 
 const baseFontSize = 14.0;
@@ -23,14 +24,18 @@ final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
   textTheme: textTheme);
 
-void main() {
+void main() async {
   if (Platform.isWindows || Platform.isLinux) {
     // Initialize FFI
     sqfliteFfiInit();
   }
   databaseFactory = databaseFactoryFfi;
   ensureDatabaseCreated();
-  DbHelper().open();
+
+  var dbHelper = DbHelper();
+  await dbHelper.open();
+  await i18nLoad();
+  i18nSetLanguage((await dbHelper.getConfig()).language);
   runApp(const App());
 }
 

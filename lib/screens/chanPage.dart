@@ -1,3 +1,4 @@
+import 'package:chat_apropo/i18n.dart';
 import 'package:chat_apropo/models/channelMessageModel.dart';
 import 'package:flutter/material.dart';
 
@@ -79,10 +80,10 @@ class _ChanPageState extends State<ChanPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    const Text(
-                      "Conversations",
+                    Text(
+                      "Conversations".i18n,
                       style:
-                          TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                          const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                     ),
                     Container(
                       padding: const EdgeInsets.only(
