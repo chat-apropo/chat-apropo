@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chat_apropo/i18n.dart';
 import 'package:chat_apropo/models/dbhelpers.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,7 @@ const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
 const VIDEO_EXTENSIONS = ['mp4', 'mov', 'avi', 'flv', 'wmv', 'mpg', 'mpeg'];
 const AUDIO_EXTENSIONS = ['mp3', 'wav', 'ogg', 'flac', 'aac', 'wma'];
 const MERGE_MESSAGE_BUBBLE_DURATION = Duration(seconds: 5);
+const UPDATE_TIME = Duration(seconds: 10);
 
 enum UrlType {
   image,
@@ -90,6 +93,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
   bool isSendMenuVisible = false;
   bool mergeMessageBubble = false;
   late String accumulatedMessage;
+  late Timer _updateTimestampsTimer;
 
   void _join() {
     irc.client.join(widget.channel);
@@ -146,6 +150,11 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     });
 
     _join();
+
+    // Updates timestamps
+    _updateTimestampsTimer = Timer.periodic(UPDATE_TIME, (Timer t) {
+      setState(() {});
+    });
   }
 
   Future _submit(String text) async {
@@ -170,6 +179,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
   @override
   void dispose() {
     textFocusNode.dispose();
+    _updateTimestampsTimer.cancel();
     super.dispose();
   }
 
@@ -241,7 +251,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
                 IconButton(
                   onPressed: () {
                     setState(() {
-                        debugPrint(i18nKeys.toString());
+                      debugPrint(i18nKeys.toString());
                     });
                   },
                   icon: const Icon(

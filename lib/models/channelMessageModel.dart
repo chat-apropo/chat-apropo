@@ -12,7 +12,7 @@ class ChannelMessage {
     text = newText ?? message.text;
     sender = message.sender;
     isMine = message.isMine;
-    timestamp = DateTime.now();
+    timestamp = message.timestamp ?? DateTime.now();
   }
 
   get date => timestamp!;
