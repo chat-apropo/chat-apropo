@@ -42,29 +42,6 @@ class _ChanPageState extends State<ChanPage> {
     ),
   ];
 
-  /// Returns "Now" if in the last 10 minutes, otherwise the hour if on the same day
-  /// otherwise the day and the month if in the same year, otherwise day month year
-  String _datetimeToString(DateTime? dateTime) {
-    if (dateTime == null) {
-      return "";
-    }
-    final now = DateTime.now();
-    // Format to 2 digits
-    final minute = dateTime.minute.toString().padLeft(2, '0');
-    final hour = dateTime.hour.toString().padLeft(2, '0');
-    final day = dateTime.day.toString().padLeft(2, '0');
-    final month = dateTime.month.toString().padLeft(2, '0');
-
-    if (dateTime.difference(now).inMinutes < 10) {
-      return "Now";
-    } else if (dateTime.day == now.day) {
-      return "$hour:$minute";
-    } else if (dateTime.year == now.year) {
-      return "$day/$month $hour:$minute";
-    } else {
-      return "$day/$month/${dateTime.year} $hour:$minute";
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +123,7 @@ class _ChanPageState extends State<ChanPage> {
                   isChannelList: true,
                   messageText: channels[index].lastMessage?.text ?? "",
                   color: nickColor(channels[index].name),
-                  time: _datetimeToString(channels[index].lastMessage?.date),
+                  time: datetimeToString(channels[index].lastMessage?.date),
                   isMessageRead: (index == 0 || index == 3) ? true : false,
                 );
               },

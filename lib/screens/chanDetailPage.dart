@@ -14,6 +14,7 @@ const SHOW_SCROLLDOWN_BUTTON_UP_BY = 400;
 const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
 const VIDEO_EXTENSIONS = ['mp4', 'mov', 'avi', 'flv', 'wmv', 'mpg', 'mpeg'];
 const AUDIO_EXTENSIONS = ['mp3', 'wav', 'ogg', 'flac', 'aac', 'wma'];
+const MERGE_MESSAGE_BUBBLE_DURATION = Duration(seconds: 5);
 
 enum UrlType {
   image,
@@ -87,6 +88,8 @@ class ChanDetailPageState extends State<ChanDetailPage> {
   ScrollController scrollController = ScrollController();
   late String channel;
   bool isSendMenuVisible = false;
+  bool mergeMessageBubble = false;
+  late String accumulatedMessage;
 
   void _join() {
     irc.client.join(widget.channel);
@@ -114,8 +117,8 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     // Joined channel
     irc.client.onClientJoin.listen((event) {
       setState(() {
-        messages.add(
-            ChannelMessage(text: "JOINED CHANNEL".i18n, sender: widget.channel));
+        messages.add(ChannelMessage(
+            text: "JOINED CHANNEL".i18n, sender: widget.channel));
       });
     });
 
@@ -267,56 +270,43 @@ class ChanDetailPageState extends State<ChanDetailPage> {
               physics: const ClampingScrollPhysics(),
               padding: const EdgeInsets.only(top: 10, bottom: 100),
               itemBuilder: (context, index) {
+                if (index == 0) {
+                  mergeMessageBubble = false;
+                }
+                // Find current and next message
                 var message = messages[index];
+                var nextMessage =
+                    index + 1 < messages.length ? messages[index + 1] : null;
+
+                if (!mergeMessageBubble) {
+                  accumulatedMessage = message.text;
+                } else {
+                  accumulatedMessage += "\n${message.text}";
+                }
+
+                // Reset collapsing state and send a preview if url
                 var url = findUrlInText(message.text);
                 if (url != null && _getUrlValid(url)) {
-                  switch (getUrlType(url)) {
-                    case UrlType.audio:
-                      return Column(children: [
-                        IrcText(message: message),
-                        const SizedBox(height: 25),
-                        AudioPlayerWidget(url: url)
-                      ]);
-                    case UrlType.video:
-                      return Column(children: [
-                        IrcText(message: message),
-                        const SizedBox(height: 25),
-                      ]);
-                    case UrlType.image:
-                      return Column(children: [
-                        IrcText(message: message),
-                        const SizedBox(height: 25),
-                        Image.network(url),
-                      ]);
-                    default:
-                      return Column(
-                        children: [
-                          IrcText(message: message),
-                          const SizedBox(height: 25),
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                            child: AnyLinkPreview(
-                              link: url,
-                              displayDirection:
-                                  UIDirection.uiDirectionHorizontal,
-                              showMultimedia: true,
-                              bodyMaxLines: 5,
-                              bodyTextOverflow: TextOverflow.ellipsis,
-                              titleStyle: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                              bodyStyle: const TextStyle(
-                                  color: Colors.grey, fontSize: 12),
-                            ),
-                          ),
-                        ],
-                      );
-                  }
+                  mergeMessageBubble = false;
+                  return _messageWithUrlPreview(message, url);
                 }
-                return IrcText(message: message);
+
+                final timeDelta = message.timestamp!
+                    .difference(nextMessage?.timestamp ?? DateTime.now())
+                    .abs();
+
+                // Check for collapsing into single bubble
+                mergeMessageBubble = nextMessage != null &&
+                    nextMessage.sender == message.sender &&
+                    timeDelta < MERGE_MESSAGE_BUBBLE_DURATION;
+
+                // Make message bubble or nothing if colapsing
+                if (mergeMessageBubble) {
+                  return Container();
+                }
+                return IrcText(
+                    message: ChannelMessage.fromMessage(
+                        message, accumulatedMessage));
               },
             ),
           ),
@@ -382,5 +372,58 @@ class ChanDetailPageState extends State<ChanDetailPage> {
         ],
       ),
     );
+  }
+
+  Column _messageWithUrlPreview(ChannelMessage message, String url) {
+    switch (getUrlType(url)) {
+      case UrlType.audio:
+        return Column(children: [
+          IrcText(
+            message: ChannelMessage.fromMessage(message, accumulatedMessage),
+          ),
+          const SizedBox(height: 25),
+          AudioPlayerWidget(url: url)
+        ]);
+      case UrlType.video:
+        return Column(children: [
+          IrcText(
+            message: ChannelMessage.fromMessage(message, accumulatedMessage),
+          ),
+          const SizedBox(height: 25),
+        ]);
+      case UrlType.image:
+        return Column(children: [
+          IrcText(
+            message: ChannelMessage.fromMessage(message, accumulatedMessage),
+          ),
+          const SizedBox(height: 25),
+          Image.network(url),
+        ]);
+      default:
+        return Column(
+          children: [
+            IrcText(
+              message: ChannelMessage.fromMessage(message, accumulatedMessage),
+            ),
+            const SizedBox(height: 25),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+              child: AnyLinkPreview(
+                link: url,
+                displayDirection: UIDirection.uiDirectionHorizontal,
+                showMultimedia: true,
+                bodyMaxLines: 5,
+                bodyTextOverflow: TextOverflow.ellipsis,
+                titleStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+                bodyStyle: const TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+            ),
+          ],
+        );
+    }
   }
 }

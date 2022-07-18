@@ -74,7 +74,12 @@ class IrcText extends StatelessWidget {
         message.sender.toLowerCase().replaceAll(regIgnoreChars, "");
     var color = nickColor(nickname);
     return Container(
-      padding: const EdgeInsets.only(left: 14, right: 14, top: 10, bottom: 10),
+      padding: const EdgeInsets.only(
+        left: 14,
+        right: 14,
+        top: 10,
+        bottom: 10,
+      ),
       child: Align(
         alignment: (!message.isMine ? Alignment.topLeft : Alignment.topRight),
         child: Container(
@@ -86,16 +91,43 @@ class IrcText extends StatelessWidget {
               width: (message.isMine ? 0 : 3),
             ),
           ),
-          padding: const EdgeInsets.all(16),
-          child: SelectableText.rich(
-            TextSpan(
-              text: "${message.sender}\n",
-              style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18),
-              children: buildTextSpan(message),
-            ),
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(
+                  left: 14,
+                  right: 14,
+                  top: 10,
+                  bottom: 5,
+                ),
+                child: SelectableText.rich(
+                  TextSpan(
+                    text: "${message.sender}\n",
+                    style: TextStyle(
+                      color: !message.isMine ? color : Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                    children: buildTextSpan(message),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 15),
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: Text(
+                  datetimeToString((message.timestamp)),
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -116,8 +148,14 @@ class IrcText extends StatelessWidget {
     backgroundColor = null;
 
     ColorAndSize getColor(int i) {
-      var character = message.text.characters.elementAt(i + 1) +
-          message.text.characters.elementAt(i + 2);
+      final c1 = message.text.characters.elementAt(i + 1);
+      final c2 = message.text.characters.elementAt(i + 2);
+      String character;
+      if (int.tryParse(c2) != null) {
+        character = c1 + c2;
+      } else {
+        character = "0$c1";
+      }
       return ColorAndSize(IrcColors.getColor(character), character.length);
     }
 

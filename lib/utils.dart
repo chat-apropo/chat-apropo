@@ -24,3 +24,28 @@ void showToast(BuildContext context, String message, [int time = 3]) {
     duration: Duration(seconds: time),
   ));
 }
+
+/// Returns "Now" if in the last 10 minutes, otherwise the hour if on the same day
+/// otherwise the day and the month if in the same year, otherwise day month year
+String datetimeToString(DateTime? dateTime) {
+  if (dateTime == null) {
+    return "";
+  }
+  final now = DateTime.now();
+  // Format to 2 digits
+  final minute = dateTime.minute.toString().padLeft(2, '0');
+  final hour = dateTime.hour.toString().padLeft(2, '0');
+  final day = dateTime.day.toString().padLeft(2, '0');
+  final month = dateTime.month.toString().padLeft(2, '0');
+
+  if (now.difference(dateTime).inMinutes < 1) {
+    return "Now";
+  } else
+  if (dateTime.day == now.day) {
+    return "$hour:$minute";
+  } else if (dateTime.year == now.year) {
+    return "$day/$month $hour:$minute";
+  } else {
+    return "$day/$month/${dateTime.year} $hour:$minute";
+  }
+}
