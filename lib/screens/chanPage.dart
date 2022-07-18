@@ -42,7 +42,6 @@ class _ChanPageState extends State<ChanPage> {
     ),
   ];
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,35 +58,20 @@ class _ChanPageState extends State<ChanPage> {
                   children: <Widget>[
                     Text(
                       "Conversations".i18n,
-                      style:
-                          const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 32, fontWeight: FontWeight.bold),
                     ),
-                    Container(
-                      padding: const EdgeInsets.only(
-                          left: 8, right: 8, top: 2, bottom: 2),
-                      height: 30,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        color: Colors.pink[50],
+                    IconButton(
+                      onPressed: () {
+                        print("TODO config");
+                        i18nSetLanguage(i18nLocale == "pt" ? "en" : "pt");
+                        setState(() {});
+                      },
+                      icon: const Icon(
+                        Icons.settings,
+                        color: Colors.black54,
                       ),
-                      child: Row(
-                        children: <Widget>[
-                          const Icon(
-                            Icons.add,
-                            color: Colors.pink,
-                            size: 20,
-                          ),
-                          const SizedBox(
-                            width: 2,
-                          ),
-                          Text(
-                            "Add New".i18n,
-                            style: const TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    )
+                    ),
                   ],
                 ),
               ),

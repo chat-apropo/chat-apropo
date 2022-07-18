@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 Set<String> i18nKeys = {};
 Map<String, Map<String, String>> i18nFileMap = {};
 Map<String, String>? i18nMap = {};
+String i18nLocale = 'en';
 
 // Function applied to keys
 String simplifyKey(String key) {
@@ -40,6 +41,7 @@ Future i18nLoad() async {
 
 void i18nSetLanguage(String isoCode) {
   debugPrint("Setting language to $isoCode");
+  i18nLocale = isoCode;
   i18nMap = i18nFileMap[isoCode];
 }
 

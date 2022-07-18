@@ -238,13 +238,13 @@ class ChanDetailPageState extends State<ChanDetailPage> {
                     ],
                   ),
                 ),
-                ElevatedButton(
+                IconButton(
                   onPressed: () {
                     setState(() {
                         debugPrint(i18nKeys.toString());
                     });
                   },
-                  child: const Icon(
+                  icon: const Icon(
                     Icons.settings,
                     color: Colors.black54,
                   ),
