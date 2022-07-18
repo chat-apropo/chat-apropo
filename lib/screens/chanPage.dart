@@ -71,18 +71,18 @@ class _ChanPageState extends State<ChanPage> {
                         color: Colors.pink[50],
                       ),
                       child: Row(
-                        children: const <Widget>[
-                          Icon(
+                        children: <Widget>[
+                          const Icon(
                             Icons.add,
                             color: Colors.pink,
                             size: 20,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 2,
                           ),
                           Text(
-                            "Add New",
-                            style: TextStyle(
+                            "Add New".i18n,
+                            style: const TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -96,7 +96,7 @@ class _ChanPageState extends State<ChanPage> {
               padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: "Search...",
+                  hintText: "Search...".i18n,
                   hintStyle: TextStyle(color: Colors.grey.shade600),
                   prefixIcon: Icon(
                     Icons.search,

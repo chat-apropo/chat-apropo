@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:chat_apropo/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_apropo/screens/chatPage.dart';
 
@@ -54,14 +55,14 @@ class _HomePageState extends State<HomePage> {
                 });
               },
               labelType: NavigationRailLabelType.all,
-              destinations: const <NavigationRailDestination>[
+              destinations: <NavigationRailDestination>[
                 NavigationRailDestination(
-                  icon: Icon(Icons.group_work),
-                  label: Text("Channels"),
+                  icon: const Icon(Icons.group_work),
+                  label: Text("Channels".i18n),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.message),
-                  label: Text("Chats"),
+                  icon: const Icon(Icons.message),
+                  label: Text("Chats".i18n),
                 ),
               ],
             ),
@@ -83,14 +84,14 @@ class _HomePageState extends State<HomePage> {
               pageIndex = index;
             });
           },
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.group_work),
-              label: "Channels",
+              icon: const Icon(Icons.group_work),
+              label: "Channels".i18n,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.message),
-              label: "Chats",
+              icon: const Icon(Icons.message),
+              label: "Chats".i18n,
             ),
           ],
         ),

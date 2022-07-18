@@ -1,4 +1,11 @@
 {
   "Conversations": "Conversas",
-  "JOINED CHANNEL": "ENTROU NO CANAL"
+  "JOINED CHANNEL": "ENTROU NA SALA",
+  "channels": "canais",
+  "chats": "conversas",
+  "add new": "adicionar novo",
+  "search...": "buscar...",
+  "now": "agora",
+  "write message...": "escreva uma mensagem...",
+  "minutes ago": "minutos atrás"
 }

@@ -238,9 +238,16 @@ class ChanDetailPageState extends State<ChanDetailPage> {
                     ],
                   ),
                 ),
-                const Icon(
-                  Icons.settings,
-                  color: Colors.black54,
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                        debugPrint(i18nKeys.toString());
+                    });
+                  },
+                  child: const Icon(
+                    Icons.settings,
+                    color: Colors.black54,
+                  ),
                 ),
               ],
             ),
@@ -328,9 +335,9 @@ class ChanDetailPageState extends State<ChanDetailPage> {
                       autofocus: true,
                       focusNode: textFocusNode,
                       onSubmitted: _submit,
-                      decoration: const InputDecoration(
-                          hintText: "Write message...",
-                          hintStyle: TextStyle(color: Colors.black54),
+                      decoration: InputDecoration(
+                          hintText: "Write message...".i18n,
+                          hintStyle: const TextStyle(color: Colors.black54),
                           border: InputBorder.none),
                     ),
                   ),

@@ -46,7 +46,6 @@ void i18nSetLanguage(String isoCode) {
 extension Translation on String {
   String get i18n {
     i18nKeys.add(toLowerCase());
-    debugPrint("Translation map: ${i18nMap?.toString() ?? 'null'}");
     return i18nMap?[simplifyKey(this)] ?? this;
   }
 }

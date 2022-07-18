@@ -1,3 +1,4 @@
+import 'package:chat_apropo/i18n.dart';
 import 'package:flutter/material.dart';
 
 final List<Color> userColorPallete = <Color>[
@@ -37,11 +38,14 @@ String datetimeToString(DateTime? dateTime) {
   final hour = dateTime.hour.toString().padLeft(2, '0');
   final day = dateTime.day.toString().padLeft(2, '0');
   final month = dateTime.month.toString().padLeft(2, '0');
+  final timeDelta = now.difference(dateTime);
 
-  if (now.difference(dateTime).inMinutes < 1) {
-    return "Now";
-  } else
-  if (dateTime.day == now.day) {
+  if (timeDelta.inMinutes < 1) {
+    return "Now".i18n;
+  } else if (timeDelta.inMinutes < 10) {
+    final msg = "minutes ago".i18n;
+    return "${timeDelta.inMinutes} $msg";
+  } else if (dateTime.day == now.day) {
     return "$hour:$minute";
   } else if (dateTime.year == now.year) {
     return "$day/$month $hour:$minute";
