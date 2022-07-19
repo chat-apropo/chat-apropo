@@ -12,12 +12,13 @@ import '../widgets/uploadFabMenu.dart';
 import '../widgets/audioPlayer.dart';
 
 // Number of pixels to scroll up by to show the go to bottom button
-const SHOW_SCROLLDOWN_BUTTON_UP_BY = 400;
-const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
-const VIDEO_EXTENSIONS = ['mp4', 'mov', 'avi', 'flv', 'wmv', 'mpg', 'mpeg'];
-const AUDIO_EXTENSIONS = ['mp3', 'wav', 'ogg', 'flac', 'aac', 'wma'];
-const MERGE_MESSAGE_BUBBLE_DURATION = Duration(seconds: 5);
-const UPDATE_TIME = Duration(seconds: 10);
+const showScrolldownButtonWhenScolledUpBy = 400;
+const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+const videoExtensions = ['mp4', 'mov', 'avi', 'flv', 'wmv', 'mpg', 'mpeg'];
+const audioExtensions = ['mp3', 'wav', 'ogg', 'flac', 'aac', 'wma'];
+const collapseMessageMinInterval = Duration(seconds: 5);
+const updateTimestampsInterval = Duration(seconds: 10);
+const loadMessagesChunkSize = 100;
 
 enum UrlType {
   image,
@@ -31,15 +32,15 @@ bool isDirectlyPreviewable(List<String> extensionList, String url) {
 }
 
 bool isImage(String url) {
-  return isDirectlyPreviewable(IMAGE_EXTENSIONS, url);
+  return isDirectlyPreviewable(imageExtensions, url);
 }
 
 bool isVideo(String url) {
-  return isDirectlyPreviewable(VIDEO_EXTENSIONS, url);
+  return isDirectlyPreviewable(videoExtensions, url);
 }
 
 bool isAudio(String url) {
-  return isDirectlyPreviewable(AUDIO_EXTENSIONS, url);
+  return isDirectlyPreviewable(audioExtensions, url);
 }
 
 UrlType getUrlType(String url) {
@@ -81,10 +82,12 @@ class ChanDetailPage extends StatefulWidget {
 }
 
 class ChanDetailPageState extends State<ChanDetailPage> {
+  final dbHelper = DbHelper();
+
+  // Load from db
   List<ChannelMessage> messages = [];
 
   var irc = IrcClient();
-  final dbHelper = DbHelper();
   bool showGoToBottomButton = false;
   final textField = TextEditingController();
   final textFocusNode = FocusNode();
@@ -142,7 +145,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
           var distanceToBottom =
               scrollController.position.maxScrollExtent - pos;
           if (!showGoToBottomButton ||
-              distanceToBottom < SHOW_SCROLLDOWN_BUTTON_UP_BY) {
+              distanceToBottom < showScrolldownButtonWhenScolledUpBy) {
             scrollDown();
           }
         }
@@ -152,9 +155,27 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     _join();
 
     // Updates timestamps
-    _updateTimestampsTimer = Timer.periodic(UPDATE_TIME, (Timer t) {
+    _updateTimestampsTimer =
+        Timer.periodic(updateTimestampsInterval, (Timer t) {
       setState(() {});
     });
+
+    _populateMessages();
+  }
+
+  Future _populateMessages() async {
+    await _loadMessages();
+  }
+
+  // Load loadMessagesChunkSize messages from db
+  Future _loadMessages([int row = 0]) async {
+    if (row == 0) {
+      messages = await dbHelper.messages(channel, loadMessagesChunkSize);
+    } else {
+      // TODO load more messages
+      messages = await dbHelper.messages(channel, loadMessagesChunkSize);
+    }
+    setState(() {});
   }
 
   Future _submit(String text) async {
@@ -275,7 +296,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
                     scrollController.position.maxScrollExtent - pos;
                 setState(() {
                   showGoToBottomButton =
-                      distanceToBottom > SHOW_SCROLLDOWN_BUTTON_UP_BY;
+                      distanceToBottom > showScrolldownButtonWhenScolledUpBy;
                 });
               }
               return false;
@@ -315,7 +336,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
                 // Check for collapsing into single bubble
                 mergeMessageBubble = nextMessage != null &&
                     nextMessage.sender == message.sender &&
-                    timeDelta < MERGE_MESSAGE_BUBBLE_DURATION;
+                    timeDelta < collapseMessageMinInterval;
 
                 // Make message bubble or nothing if colapsing
                 if (mergeMessageBubble) {

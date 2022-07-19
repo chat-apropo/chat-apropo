@@ -177,17 +177,32 @@ class DbHelper {
   }
 
   /// Gets chunk of messages from a channel
-  Future<List<ChannelMessage>> messages(
-      String channeName, int start, int end) async {
+  /// If end is not passed, it will return the last START messages
+  Future<List<ChannelMessage>> messages(String channeName, int start,
+      [int end = -1]) async {
     final db = _db!;
     final channelId = await _getChannelId(channeName);
 
-    final List<Map<String, dynamic>> maps = await db.query(
-      'messages',
-      where: 'channelId = ? AND seqId >= ? AND seqId <= ?',
-      whereArgs: [channelId, start, end],
-      orderBy: 'seqId ASC',
-    );
+    if (channelId == null) return [];
+
+    List<Map<String, dynamic>> maps;
+    if (end > -1) {
+      maps = await db.query(
+        'messages',
+        where: 'channelId = ? AND seqId >= ? AND seqId <= ?',
+        whereArgs: [channelId, start, end],
+        orderBy: 'seqId ASC',
+      );
+    } else {
+      maps = await db.query(
+        'messages',
+        where: 'channelId = ?',
+        whereArgs: [channelId],
+        orderBy: 'seqId DESC',
+        limit: start,
+      );
+      // maps = maps.reversed.toList();
+    }
 
     return List.generate(maps.length, (i) {
       return ChannelMessage(
