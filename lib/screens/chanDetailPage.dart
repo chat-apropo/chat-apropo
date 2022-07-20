@@ -7,6 +7,7 @@ import 'package:chat_apropo/ircClient.dart';
 import 'package:chat_apropo/models/channelMessageModel.dart';
 import 'package:chat_apropo/widgets/ircTextMessage.dart';
 import 'package:any_link_preview/any_link_preview.dart';
+import 'package:flutter/scheduler.dart';
 
 import '../widgets/uploadFabMenu.dart';
 import '../widgets/audioPlayer.dart';
@@ -134,11 +135,14 @@ class ChanDetailPageState extends State<ChanDetailPage> {
       debugPrint(
           "<${event.target!.name}><${event.from?.name}> ${event.message}");
 
+      // TODO background service populating all messages for all joined channels database
+      if (event.target?.name != widget.channel) {
+        return;
+      }
       var message = ChannelMessage(
           text: event.message ?? "", sender: event.from?.name ?? "--");
-      await dbHelper.insertMessage(widget.channel, message);
+      dbHelper.addMessage(widget.channel, message);
       setState(() {
-        if (event.target?.name == widget.channel) {
           messages.add(message);
 
           var pos = scrollController.position.pixels;
@@ -148,7 +152,6 @@ class ChanDetailPageState extends State<ChanDetailPage> {
               distanceToBottom < showScrolldownButtonWhenScolledUpBy) {
             scrollDown();
           }
-        }
       });
     });
 
@@ -161,6 +164,14 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     });
 
     _populateMessages();
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 10),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   Future _populateMessages() async {
@@ -192,7 +203,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
       setState(() {});
       textFocusNode.requestFocus();
 
-      await dbHelper.insertMessage(widget.channel, message, true);
+      dbHelper.addMessage(widget.channel, message);
     }
     scrollDown();
   }

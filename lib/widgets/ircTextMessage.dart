@@ -117,7 +117,7 @@ class IrcText extends StatelessWidget {
               ),
               const SizedBox(height: 15),
               Padding(
-                padding: const EdgeInsets.only(right: 16),
+                padding: const EdgeInsets.only(right: 8),
                 child: Text(
                   datetimeToString((message.timestamp)),
                   textAlign: TextAlign.right,

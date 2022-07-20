@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:chat_apropo/models/chanModel.dart';
@@ -32,7 +33,7 @@ Future createMessageTables(db, version) async {
     );
     CREATE TABLE IF NOT EXISTS messages (
       id INTEGER PRIMARY KEY,
-      seqId INTEGER NOT NULL,
+      seqId INTEGER NOT NULL UNIQUE,
       message TEXT NOT NULL,
       sender TEXT NOT NULL,
       isMine INTEGER,
@@ -99,9 +100,18 @@ class DbMessage {
   });
 }
 
+class MessageQueueItem {
+  final String channelName;
+  final ChannelMessage message;
+
+  MessageQueueItem({required this.channelName, required this.message});
+}
+
 /// Singleton wrapper around database
 class DbHelper {
   DbHelper._privateConstructor();
+  final _messageQueue = Queue<MessageQueueItem>();
+  bool _messageQueueRunning = false;
 
   static final DbHelper _instance = DbHelper._privateConstructor();
 
@@ -191,7 +201,7 @@ class DbHelper {
         'messages',
         where: 'channelId = ? AND seqId >= ? AND seqId <= ?',
         whereArgs: [channelId, start, end],
-        orderBy: 'seqId ASC',
+        orderBy: 'seqId DESC',
       );
     } else {
       maps = await db.query(
@@ -201,14 +211,15 @@ class DbHelper {
         orderBy: 'seqId DESC',
         limit: start,
       );
-      // maps = maps.reversed.toList();
     }
+    maps = maps.reversed.toList();
 
     return List.generate(maps.length, (i) {
       return ChannelMessage(
         text: maps[i]['message'],
         sender: maps[i]['sender'],
         timestamp: DateTime.fromMillisecondsSinceEpoch(maps[i]['timestamp']),
+        isMine: maps[i]['isMine'] == 1,
       );
     });
   }
@@ -266,8 +277,7 @@ class DbHelper {
   /// Inserts a new message
   /// Updates the channels lastMessage
   /// Inserts the channel if it doesn't exist
-  Future<int> insertMessage(String channelName, ChannelMessage message,
-      [bool isMine = false]) async {
+  Future<int> insertMessage(String channelName, ChannelMessage message) async {
     final db = _db!;
     var channelId = await _getChannelId(channelName);
     channelId ??= await insertChannel(Channel(name: channelName));
@@ -277,12 +287,40 @@ class DbHelper {
       'sender': message.sender,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
       'channelId': channelId,
-      'isMine': isMine ? 1 : 0,
+      'isMine': message.isMine ? 1 : 0,
       'seqId': lastMessageSeqId + 1,
     };
     final messageId = await db.insert('messages', data);
     await db.update('channels', {'lastMessage': messageId},
         where: 'id = ?', whereArgs: [channelId]);
     return messageId;
+  }
+
+  /// Adds message to insert to queue
+  /// It is important to add messages only using this method to avoid duplicated seqids
+  void addMessage(String channelName, ChannelMessage message) {
+    _messageQueue.add(
+      MessageQueueItem(
+        channelName: channelName,
+        message: message,
+      ),
+    );
+    _processQueue();
+  }
+
+  /// Processes the message queue
+  Future _processQueue() async {
+    if (_messageQueueRunning) return;
+    await __processQueue();
+  }
+
+  Future __processQueue() async {
+    if (_messageQueue.isEmpty) return;
+    _messageQueueRunning = true;
+    final item = _messageQueue.first;
+    await insertMessage(item.channelName, item.message);
+    _messageQueue.removeFirst();
+    await __processQueue();
+    _messageQueueRunning = false;
   }
 }
