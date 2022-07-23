@@ -64,52 +64,55 @@ class AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
    @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Slider(
-          min: 0.0,
-          max: duration.inSeconds.toDouble(),
-          value: position.inSeconds.toDouble(),
-          onChanged: (double value) async {
-            position = Duration(milliseconds: value.toInt());
-            await audioPlayer.seek(position);
-          },
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                formatTime(position),
-                style: const TextStyle(fontSize: 16.0),
-              ),
-              Text(
-                formatTime(duration),
-                style: const TextStyle(fontSize: 16.0),
-              ),
-            ],
-          ),
-        ),
-        CircleAvatar(
-          radius: 35,
-          child: IconButton(
-            icon: Icon(
-              isPlaying ? Icons.pause : Icons.play_arrow,
-            ),
-            onPressed: () async {
-              if (isPlaying) {
-                await audioPlayer.pause();
-              } else {
-                await audioPlayer.resume();
-              }
-              setState(() {
-                isPlaying = !isPlaying;
-              });
+    return SizedBox(
+      width: 400,
+      child: Column(
+        children: [
+          Slider(
+            min: 0.0,
+            max: duration.inSeconds.toDouble(),
+            value: position.inSeconds.toDouble(),
+            onChanged: (double value) async {
+              position = Duration(milliseconds: value.toInt());
+              await audioPlayer.seek(position);
             },
           ),
-        )
-      ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  formatTime(position),
+                  style: const TextStyle(fontSize: 16.0),
+                ),
+                Text(
+                  formatTime(duration),
+                  style: const TextStyle(fontSize: 16.0),
+                ),
+              ],
+            ),
+          ),
+          CircleAvatar(
+            radius: 35,
+            child: IconButton(
+              icon: Icon(
+                isPlaying ? Icons.pause : Icons.play_arrow,
+              ),
+              onPressed: () async {
+                if (isPlaying) {
+                  await audioPlayer.pause();
+                } else {
+                  await audioPlayer.resume();
+                }
+                setState(() {
+                  isPlaying = !isPlaying;
+                });
+              },
+            ),
+          )
+        ],
+      ),
     );
   }
 }

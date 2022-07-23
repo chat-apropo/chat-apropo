@@ -437,15 +437,17 @@ class ChanDetailPageState extends State<ChanDetailPage> {
           IrcText(
             message: accmessage,
           ),
-          const SizedBox(height: 25),
         ]);
       case UrlType.image:
         return Column(children: [
           IrcText(
             message: accmessage,
+            child: Image.network(
+              url,
+              width: 400,
+              fit: BoxFit.cover,
+            ),
           ),
-          const SizedBox(height: 25),
-          Image.network(url),
         ]);
       default:
         return Column(
