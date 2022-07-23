@@ -64,15 +64,67 @@ class IrcColors {
   }
 }
 
+// Message Box
 class IrcText extends StatelessWidget {
   final ChannelMessage message;
-  const IrcText({Key? key, required this.message}) : super(key: key);
+  final Widget? child;
+  const IrcText({
+    Key? key,
+    required this.message,
+    this.child,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     String nickname =
         message.sender.toLowerCase().replaceAll(regIgnoreChars, "");
-    var color = nickColor(nickname);
+    final color = nickColor(nickname);
+
+    // HACK TODO coudln't manage to align sender without adding spaces around it
+    // Get longest line
+    final longestLine = message.text.split("\n").reduce(
+          (a, b) => a.length > b.length ? a : b,
+        );
+    // Create spaces for each character minus sender length
+    final width = longestLine.length - nickname.length;
+    var spaces = "";
+    if (width > 0) {
+      spaces = List<String>.generate((width * 1.5).ceil(), (i) => " ").join();
+    }
+    final sender = message.isMine
+        ? "$spaces${message.sender}"
+        : "${message.sender}$spaces";
+
+    List<Widget> bodyWidgets = [
+      SelectableText.rich(
+        TextSpan(
+          children: [
+            WidgetSpan(
+              child: Text(
+                sender,
+                style: TextStyle(
+                  color: !message.isMine ? color : Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            const TextSpan(
+              text: "\n",
+            ),
+            ...buildTextSpan(message),
+          ],
+        ),
+      ),
+    ];
+
+    if (child != null) {
+      bodyWidgets.add(
+        const SizedBox(height: 25),
+      );
+      bodyWidgets.add(child!);
+    }
+
     return Container(
       padding: const EdgeInsets.only(
         left: 14,
@@ -103,28 +155,11 @@ class IrcText extends StatelessWidget {
                   top: 10,
                   bottom: 5,
                 ),
-                child: SelectableText.rich(
-                  TextSpan(
-                    text: "${message.sender}\n",
-                    style: TextStyle(
-                      color: !message.isMine ? color : Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                    children: buildTextSpan(message),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 15),
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Text(
-                  datetimeToString((message.timestamp)),
-                  textAlign: TextAlign.right,
-                  style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12),
+                child: Column(
+                  crossAxisAlignment: (!message.isMine
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.end),
+                  children: bodyWidgets,
                 ),
               ),
             ],

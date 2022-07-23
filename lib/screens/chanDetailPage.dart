@@ -143,15 +143,14 @@ class ChanDetailPageState extends State<ChanDetailPage> {
           text: event.message ?? "", sender: event.from?.name ?? "--");
       dbHelper.addMessage(widget.channel, message);
       setState(() {
-          messages.add(message);
+        messages.add(message);
 
-          var pos = scrollController.position.pixels;
-          var distanceToBottom =
-              scrollController.position.maxScrollExtent - pos;
-          if (!showGoToBottomButton ||
-              distanceToBottom < showScrolldownButtonWhenScolledUpBy) {
-            scrollDown();
-          }
+        var pos = scrollController.position.pixels;
+        var distanceToBottom = scrollController.position.maxScrollExtent - pos;
+        if (!showGoToBottomButton ||
+            distanceToBottom < showScrolldownButtonWhenScolledUpBy) {
+          scrollDown();
+        }
       });
     });
 
@@ -424,26 +423,26 @@ class ChanDetailPageState extends State<ChanDetailPage> {
   }
 
   Column _messageWithUrlPreview(ChannelMessage message, String url) {
+    final accmessage = ChannelMessage.fromMessage(message, accumulatedMessage);
     switch (getUrlType(url)) {
       case UrlType.audio:
         return Column(children: [
           IrcText(
-            message: ChannelMessage.fromMessage(message, accumulatedMessage),
+            message: accmessage,
+            child: AudioPlayerWidget(url: url),
           ),
-          const SizedBox(height: 25),
-          AudioPlayerWidget(url: url)
         ]);
       case UrlType.video:
         return Column(children: [
           IrcText(
-            message: ChannelMessage.fromMessage(message, accumulatedMessage),
+            message: accmessage,
           ),
           const SizedBox(height: 25),
         ]);
       case UrlType.image:
         return Column(children: [
           IrcText(
-            message: ChannelMessage.fromMessage(message, accumulatedMessage),
+            message: accmessage,
           ),
           const SizedBox(height: 25),
           Image.network(url),
@@ -452,7 +451,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
         return Column(
           children: [
             IrcText(
-              message: ChannelMessage.fromMessage(message, accumulatedMessage),
+              message: accmessage,
             ),
             const SizedBox(height: 25),
             Padding(

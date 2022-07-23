@@ -25,16 +25,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    openAudio();
     var client = IrcClient();
     client.connect();
-  }
-
-  Future openAudio() async {
-    await AudioPlayer.global.changeLogLevel(LogLevel.info);
-    var player = AudioPlayer();
-    await player.play(AssetSource("test.mp3"));
-    await player.dispose();
   }
 
   @override

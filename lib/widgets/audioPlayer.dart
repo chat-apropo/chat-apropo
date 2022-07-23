@@ -56,7 +56,10 @@ class AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   Future setAudio() async {
     await AudioPlayer.global.changeLogLevel(LogLevel.info);
     // audioPlayer.setReleaseMode(ReleaseMode.loop);
-    await audioPlayer.setSourceUrl(widget.url);
+    WidgetsBinding.instance
+          .addPostFrameCallback((_) async {
+        await audioPlayer.setSourceUrl(widget.url);
+      });
   }
 
    @override
