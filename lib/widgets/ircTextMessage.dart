@@ -1,9 +1,15 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/channelMessageModel.dart';
 import '../utils.dart';
 
-RegExp regIgnoreChars = RegExp(r""",|\.|;|'|@|"|\*|\?|""");
+final RegExp regIgnoreChars = RegExp(r""",|\.|;|'|@|"|\*|\?|""");
+final regUrl = RegExp(r'((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+(?:[.][a-z]{2,4})+/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'"''"'".,<>?«»“”‘’]))',
+    caseSensitive: false,
+    multiLine: false);
+
 
 const boldEscape = '\x02';
 const italicEscape = '\x1D';
@@ -112,7 +118,7 @@ class IrcText extends StatelessWidget {
             const TextSpan(
               text: "\n",
             ),
-            ...buildTextSpan(message),
+            ...buildTextSpan(context, message),
           ],
         ),
       ),
@@ -169,9 +175,17 @@ class IrcText extends StatelessWidget {
     );
   }
 
+  _launchUrl(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    if (!await canLaunchUrl(uri)) {
+      showToast(context, "Could not open the url. Make sure you've allowed the app to open links.");
+    }
+    await launchUrl(uri);
+  }
+
   /// Builds the text span for the message using irc colors.
   /// The text span is built using the [message] text.
-  List<TextSpan> buildTextSpan(ChannelMessage message) {
+  List<TextSpan> buildTextSpan(BuildContext context, ChannelMessage message) {
     // Loop over the message text and build the text span.
     List<TextSpan> textSpans = [];
 
@@ -194,7 +208,35 @@ class IrcText extends StatelessWidget {
       return ColorAndSize(IrcColors.getColor(character), character.length);
     }
 
+    final urlIndexes = regUrl.allMatches(message.text).toList();
+    var nextUrlIndex = 0;
+
     for (int i = 0; i < message.text.length; i++) {
+      final nextUrlMatch = urlIndexes.isNotEmpty
+          ? urlIndexes.elementAt(nextUrlIndex)
+          : null;
+      if (nextUrlMatch != null && i == nextUrlMatch.start) {
+        final url = nextUrlMatch.group(0) ?? "";
+        textSpans.add(
+          TextSpan(
+            text: url,
+            style: TextStyle(
+              color: Colors.blue,
+              backgroundColor: backgroundColor,
+              fontWeight: (isBold ? FontWeight.bold : FontWeight.normal),
+              fontStyle: (isItalic ? FontStyle.italic : FontStyle.normal),
+              decoration: TextDecoration.underline,
+            ),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                _launchUrl(context, url);
+              },
+          ),
+        );
+        i = nextUrlMatch.end;
+        nextUrlIndex++;
+        continue;
+      }
       String character = message.text.characters.elementAt(i);
       if (character == IrcColors.escape) {
         // Check for background color
