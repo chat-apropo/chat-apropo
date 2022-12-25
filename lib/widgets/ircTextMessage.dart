@@ -1,3 +1,4 @@
+import 'package:chat_apropo/ircClient.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -6,10 +7,12 @@ import '../models/channelMessageModel.dart';
 import '../utils.dart';
 
 final RegExp regIgnoreChars = RegExp(r""",|\.|;|'|@|"|\*|\?|""");
-final regUrl = RegExp(r'((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+(?:[.][a-z]{2,4})+/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'"''"'".,<>?«»“”‘’]))',
+final regUrl = RegExp(
+    r'((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+(?:[.][a-z]{2,4})+/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'
+    "''"
+    '".,<>?«»“”‘’]))',
     caseSensitive: false,
     multiLine: false);
-
 
 const boldEscape = '\x02';
 const italicEscape = '\x1D';
@@ -178,7 +181,8 @@ class IrcText extends StatelessWidget {
   _launchUrl(BuildContext context, String url) async {
     final uri = Uri.parse(url);
     if (!await canLaunchUrl(uri)) {
-      showToast(context, "Could not open the url. Make sure you've allowed the app to open links.");
+      showToast(context,
+          "Could not open the url. Make sure you've allowed the app to open links.");
     }
     await launchUrl(uri);
   }
@@ -186,7 +190,14 @@ class IrcText extends StatelessWidget {
   /// Builds the text span for the message using irc colors.
   /// The text span is built using the [message] text.
   List<TextSpan> buildTextSpan(BuildContext context, ChannelMessage message) {
-    // Loop over the message text and build the text span.
+    var irc = IrcClient();
+    final channel = irc.client.getChannel(message.channel);
+    List<String?> nickList;
+    if (channel == null) {
+      nickList = [];
+    } else {
+      nickList = channel.allUsers.map((e) => e?.nickname).toList();
+    }
     List<TextSpan> textSpans = [];
 
     Color? foregroundColor = IrcColors.defaultColor;
@@ -211,10 +222,22 @@ class IrcText extends StatelessWidget {
     final urlIndexes = regUrl.allMatches(message.text).toList();
     var nextUrlIndex = 0;
 
+    // Regex that could be any of the words in nickList
+    String nickRegexStr = "";
+    for (final nick in nickList) {
+      if (nick == null) continue;
+      nickRegexStr += "$nick|";
+    }
+    nickRegexStr = nickRegexStr.substring(0, nickRegexStr.length - 1);
+    final regNick = RegExp("\\b(${nickRegexStr})\\b", caseSensitive: false);
+    final nickIndexes = regNick.allMatches(message.text).toList();
+    var nextNickIndex = 0;
+
     for (int i = 0; i < message.text.length; i++) {
-      final nextUrlMatch = urlIndexes.isNotEmpty
-          ? urlIndexes.elementAt(nextUrlIndex)
-          : null;
+      // ----------------------------------------------------------------
+      // URL handling
+      final nextUrlMatch =
+          urlIndexes.isNotEmpty && urlIndexes.length > nextUrlIndex ? urlIndexes.elementAt(nextUrlIndex) : null;
       if (nextUrlMatch != null && i == nextUrlMatch.start) {
         final url = nextUrlMatch.group(0) ?? "";
         textSpans.add(
@@ -237,6 +260,27 @@ class IrcText extends StatelessWidget {
         nextUrlIndex++;
         continue;
       }
+      // ----------------------------------------------------------------
+      // Nick handling
+      var nextNickMatch =
+          nickIndexes.isNotEmpty && nickIndexes.length > nextNickIndex ? nickIndexes.elementAt(nextNickIndex) : null;
+      if (nextNickMatch != null && i == nextNickMatch.start) {
+        final nick = nextNickMatch.group(0) ?? "";
+        textSpans.add(TextSpan(
+          text: nick,
+          style: TextStyle(
+            color: nickColor(nick),
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ));
+        i = nextNickMatch.end - 1;
+        nextNickIndex++;
+        continue;
+      }
+
+      // ----------------------------------------------------------------
+      // Text formatting handling
       String character = message.text.characters.elementAt(i);
       if (character == IrcColors.escape) {
         // Check for background color
@@ -303,4 +347,5 @@ class IrcText extends StatelessWidget {
     }
     return textSpans;
   }
+  // ----------------------------------------------------------------
 }
