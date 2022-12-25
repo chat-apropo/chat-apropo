@@ -172,6 +172,17 @@ class DbHelper {
     return await _db!.insert('channels', data);
   }
 
+  Future<String?> _getChannelName(int channelId) async {
+    final db = _db!;
+    final List<Map<String, dynamic>> channel = await db.query(
+      'channels',
+      where: 'id = ?',
+      whereArgs: [channelId],
+    );
+    if (channel.isEmpty) return null;
+    return channel.first['name'];
+  }
+
   Future<int?> _getChannelId(String channeName) async {
     final channel = await _db!
         .query('channels', where: 'name = ?', whereArgs: [channeName]);
@@ -188,10 +199,10 @@ class DbHelper {
 
   /// Gets chunk of messages from a channel
   /// If end is not passed, it will return the last START messages
-  Future<List<ChannelMessage>> messages(String channeName, int start,
+  Future<List<ChannelMessage>> messages(String channelName, int start,
       [int end = -1]) async {
     final db = _db!;
-    final channelId = await _getChannelId(channeName);
+    final channelId = await _getChannelId(channelName);
 
     if (channelId == null) return [];
 
@@ -218,6 +229,7 @@ class DbHelper {
       return ChannelMessage(
         text: maps[i]['message'],
         sender: maps[i]['sender'],
+        channel: channelName,
         timestamp: DateTime.fromMillisecondsSinceEpoch(maps[i]['timestamp']),
         isMine: maps[i]['isMine'] == 1,
       );
@@ -241,6 +253,7 @@ class DbHelper {
     return ChannelMessage(
       text: maps.first['message'],
       sender: maps.first['sender'],
+      channel: channeName,
       timestamp: DateTime.fromMillisecondsSinceEpoch(maps.first['timestamp']),
     );
   }
@@ -253,9 +266,14 @@ class DbHelper {
       where: 'id = ?',
       whereArgs: [id],
     );
+    final channelName = await _getChannelName(maps.first['channelId'] as int);
+    if (channelName == null) {
+      throw Exception('Channel not found');
+    }
     return ChannelMessage(
       text: maps.first['message'],
       sender: maps.first['sender'],
+      channel: channelName,
       timestamp: DateTime.fromMillisecondsSinceEpoch(maps.first['timestamp']),
     );
   }
@@ -298,10 +316,10 @@ class DbHelper {
 
   /// Adds message to insert to queue
   /// It is important to add messages only using this method to avoid duplicated seqids
-  void addMessage(String channelName, ChannelMessage message) {
+  void addMessage(ChannelMessage message) {
     _messageQueue.add(
       MessageQueueItem(
-        channelName: channelName,
+        channelName: message.channel,
         message: message,
       ),
     );

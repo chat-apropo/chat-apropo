@@ -1,9 +1,10 @@
 class ChannelMessage {
   late String text;
   late String sender;
+  late String channel;
   late bool isMine;
   DateTime? timestamp;
-  ChannelMessage({required this.text, required this.sender, this.isMine=false, this.timestamp}) {
+  ChannelMessage({required this.text, required this.sender, required this.channel, this.isMine=false, this.timestamp}) {
     timestamp ??= DateTime.now();
   }
 
@@ -13,6 +14,7 @@ class ChannelMessage {
     sender = message.sender;
     isMine = message.isMine;
     timestamp = message.timestamp ?? DateTime.now();
+    channel = message.channel;
   }
 
   get date => timestamp!;

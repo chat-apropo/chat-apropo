@@ -126,7 +126,7 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     irc.client.onClientJoin.listen((event) {
       setState(() {
         messages.add(ChannelMessage(
-            text: "JOINED CHANNEL".i18n, sender: widget.channel));
+            text: "JOINED CHANNEL".i18n, sender: widget.channel, channel: channel));
       });
     });
 
@@ -140,8 +140,8 @@ class ChanDetailPageState extends State<ChanDetailPage> {
         return;
       }
       var message = ChannelMessage(
-          text: event.message ?? "", sender: event.from?.name ?? "--");
-      dbHelper.addMessage(widget.channel, message);
+          text: event.message ?? "", sender: event.from?.name ?? "--", channel: widget.channel);
+      dbHelper.addMessage(message);
       setState(() {
         messages.add(message);
 
@@ -196,13 +196,14 @@ class ChanDetailPageState extends State<ChanDetailPage> {
       var message = ChannelMessage(
         text: text,
         sender: irc.client.nickname ?? "You",
+        channel: widget.channel,
         isMine: true,
       );
       messages.add(message);
       setState(() {});
       textFocusNode.requestFocus();
 
-      dbHelper.addMessage(widget.channel, message);
+      dbHelper.addMessage(message);
     }
     scrollDown();
   }

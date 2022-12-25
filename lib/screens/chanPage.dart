@@ -21,6 +21,7 @@ class _ChanPageState extends State<ChanPage> {
       lastMessage: ChannelMessage(
           text: "Last message here",
           sender: "John",
+          channel: "#romanian",
           timestamp: DateTime.now(),
           isMine: false),
     ),
@@ -29,6 +30,7 @@ class _ChanPageState extends State<ChanPage> {
       lastMessage: ChannelMessage(
           text: "Last message here",
           sender: "John",
+          channel: "#bots",
           timestamp: DateTime.now(),
           isMine: false),
     ),
@@ -37,6 +39,7 @@ class _ChanPageState extends State<ChanPage> {
       lastMessage: ChannelMessage(
           text: "Last message here",
           sender: "John",
+          channel: "#radio",
           timestamp: DateTime.now(),
           isMine: false),
     ),
