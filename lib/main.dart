@@ -46,12 +46,13 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     WidgetsFlutterBinding.ensureInitialized();
     return MaterialApp(
-      title: 'Chat Apropo',
+      title: 'GasconChat',
       theme: myTheme,
       // darkTheme: darkTheme,
       // themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
-      home: const HomePage(),
+      // home: const HomePage(),
+      home: const SignUpScreen(),
     );
   }
 }

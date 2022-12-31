@@ -1,4 +1,3 @@
-import 'package:chat_apropo/screens/login_page.dart';
 import 'package:flutter/material.dart';
 
 String? validateNickname(value) {
@@ -24,7 +23,8 @@ String? validatePassword(value) {
 }
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+  final bool login;
+  const SignUpScreen({super.key, this.login = false});
 
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
@@ -40,10 +40,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sign Up'),
+        title: Text(widget.login ? 'Login' : 'Sign Up'),
       ),
       body: Container(
-        color: const Color(0xfff0f0f0),
+        color: const Color(0xfff8f8f8),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Padding(
@@ -67,9 +67,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                   const SizedBox(height: 48.0),
-                  const Text(
-                    'Create your Account',
-                    style: TextStyle(
+                  Text(
+                    widget.login
+                        ? 'Login into your existing account'
+                        : 'Create your Account',
+                    style: const TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
                     ),
@@ -87,23 +89,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     validator: validatePassword,
                     onSaved: (value) => _password = value,
                   ),
-                  const SizedBox(height: 16.0),
-                  TextFormField(
-                    decoration: buildInputDecoration('Confirm Password'),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value?.isEmpty ?? true) {
-                        return 'Please enter a password';
-                      }
-                      if (value != _password) {
-                        return 'Passwords do not match';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) => _passwordConfirmation = value,
-                  ),
+                  ...(widget.login
+                      ? []
+                      : [
+                          const SizedBox(height: 16.0),
+                          TextFormField(
+                            decoration:
+                                buildInputDecoration('Confirm Password'),
+                            obscureText: true,
+                            validator: (value) {
+                              if (value?.isEmpty ?? true) {
+                                return 'Please enter a password';
+                              }
+                              if (value != _password) {
+                                return 'Passwords do not match';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) => _passwordConfirmation = value,
+                          ),
+                        ]),
                   const SizedBox(height: 32.0),
-                  Container(
+                  SizedBox(
                     width: double.infinity,
                     height: 48.0,
                     child: TextButton(
@@ -118,19 +125,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       onPressed: () {
                         _formKey.currentState?.save();
                         if (_formKey.currentState?.validate() ?? false) {
-                          print(
-                              '$_nickname, $_password, $_passwordConfirmation');
+                          if (widget.login) {
+                            print('Logging in with: $_nickname, $_password');
+                          } else {
+                            print(
+                                'singing up with: $_nickname, $_password, $_passwordConfirmation');
+                          }
                         }
                       },
                       child: const Text("Sign Up"),
                     ),
                   ),
                   const SizedBox(height: 16.0),
-                  LoginSwitchRow(
-                    builder: (context) => LoginScreen(),
-                    question: 'Already have an account?',
-                    buttonText: 'Log In',
-                  ),
+                  widget.login
+                      ? LoginSwitchRow(
+                          builder: (context) => SignUpScreen(),
+                          question: 'Don\'t have an account?',
+                          buttonText: 'Sign up',
+                        )
+                      : LoginSwitchRow(
+                          builder: (context) => const LoginScreen(),
+                          question: 'Already have an account?',
+                          buttonText: 'Log In',
+                        ),
                 ],
               ),
             ),
@@ -138,6 +155,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
     );
+  }
+}
+
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SignUpScreen(login: true);
   }
 }
 
@@ -170,8 +196,8 @@ class LoginSwitchRow extends StatelessWidget {
           },
           child: Text(
             buttonText,
-            style: TextStyle(
-              color: const Color(0xff0659fd),
+            style: const TextStyle(
+              color: Color(0xff0659fd),
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
