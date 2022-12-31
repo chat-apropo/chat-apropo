@@ -46,6 +46,11 @@ Future createMessageTables(db, version) async {
       language TEXT NOT NULL,
       theme INTEGER NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS account (
+      id INTEGER PRIMARY KEY,
+      nickname TEXT NOT NULL,
+      password TEXT NOT NULL
+    );
   ''');
 
   final String defaultLocale = Platform.localeName.split('_').first;
@@ -105,6 +110,13 @@ class MessageQueueItem {
   final ChannelMessage message;
 
   MessageQueueItem({required this.channelName, required this.message});
+}
+
+class Account {
+  final String nickname;
+  final String password;
+
+  Account({required this.nickname, required this.password});
 }
 
 /// Singleton wrapper around database
@@ -340,5 +352,16 @@ class DbHelper {
     _messageQueue.removeFirst();
     await __processQueue();
     _messageQueueRunning = false;
+  }
+
+  /// Retrieves the user account
+  Future<Account?> account() async {
+    final List<Map<String, dynamic>> maps = await _db!.query('account');
+    if (maps.isEmpty) return null;
+    // TODO manage multiple accounts?
+    return Account(
+      nickname: maps.last['name'],
+      password: maps.last['password'],
+    );
   }
 }

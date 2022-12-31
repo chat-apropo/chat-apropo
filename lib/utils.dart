@@ -1,3 +1,4 @@
+
 import 'package:chat_apropo/i18n.dart';
 import 'package:flutter/material.dart';
 
@@ -42,8 +43,7 @@ String datetimeToString(DateTime? dateTime) {
 
   if (timeDelta.inMinutes < 1) {
     return "Now".i18n;
-  } else
-  if (timeDelta.inMinutes < 10) {
+  } else if (timeDelta.inMinutes < 10) {
     final msg = "min ago".i18n;
     return "${timeDelta.inMinutes} $msg";
   } else if (dateTime.day == now.day) {

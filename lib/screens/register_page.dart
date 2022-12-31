@@ -1,6 +1,8 @@
+import 'package:chat_apropo/ircClient.dart';
+import 'package:chat_apropo/utils.dart';
 import 'package:flutter/material.dart';
 
-String? validateNickname(value) {
+String? validateNickname(String? value) {
   if (value?.isEmpty ?? true) {
     return 'Please enter a nickname';
   }
@@ -12,7 +14,28 @@ String? validateNickname(value) {
   return null;
 }
 
-String? validatePassword(value) {
+/// Check with nickserv if the nickname is already taken
+Future<String?> validateNicknameInServer(String? nickname, IrcClient irc) async {
+  String? message;
+  irc.client.sendMessage('nickserv', 'info $nickname');
+  await for (final event in irc.client.onMessage) {
+    var response = event.message!.toLowerCase();
+    var fromNick = event.from!.name!.toLowerCase();
+    if (fromNick == 'nickserv') {
+      if (response.contains('isn\'t registered.')) {
+        message = null;
+        break;
+      }
+      if (response.contains('${nickname!.toLowerCase()} is ')) {
+        message = 'Sorry, this nickname is already taken';
+        break;
+      }
+    }
+  }
+  return message;
+}
+
+String? validatePassword(String? value) {
   if (value?.isEmpty ?? true) {
     return 'Please enter a password';
   }
@@ -82,9 +105,19 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+  String? _nicknameSignupErr;
   String? _nickname;
   String? _password;
   String? _passwordConfirmation;
+
+  var irc = IrcClient();
+
+  @override
+  void initState() {
+    super.initState();
+    var client = IrcClient();
+    client.connect();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +141,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     minHeight: 500,
                     minWidth: 300,
                     maxHeight: MediaQuery.of(context).size.height,
-
                     maxWidth: 1200,
                   ),
                   child: Column(
@@ -141,7 +173,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       const SizedBox(height: 16.0),
                       TextFormField(
                         decoration: buildInputDecoration('Nickname'),
-                        validator: validateNickname,
+                        validator: (value) {
+                          validateNickname(value);
+                          if (widget.login) {
+                            return null;
+                          }
+                          return _nicknameSignupErr;
+                        },
                         onSaved: (value) => _nickname = value,
                       ),
                       const SizedBox(height: 16.0),
@@ -168,7 +206,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   }
                                   return null;
                                 },
-                                onSaved: (value) => _passwordConfirmation = value,
+                                onSaved: (value) =>
+                                    _passwordConfirmation = value,
                               ),
                             ]),
                       const SizedBox(height: 32.0),
@@ -185,18 +224,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   BorderRadius.all(Radius.circular(32.0)),
                             ),
                           ),
-                          onPressed: () {
+                          onPressed: () async {
                             _formKey.currentState?.save();
+                            _nicknameSignupErr = null;
                             if (_formKey.currentState?.validate() ?? false) {
                               if (widget.login) {
-                                print('Logging in with: $_nickname, $_password');
+                                print(
+                                    'Logging in with: $_nickname, $_password');
                               } else {
+                                _nicknameSignupErr = await validateNicknameInServer(_nickname, irc);
+                                if (_nicknameSignupErr != null) {
+                                  _formKey.currentState?.validate();
+                                  return;
+                                }
                                 print(
                                     'singing up with: $_nickname, $_password, $_passwordConfirmation');
                               }
                             }
                           },
-                          child: Text(widget.login? "Login" : "Sign Up"),
+                          child: Text(widget.login ? "Login" : "Sign Up"),
                         ),
                       ),
                       const SizedBox(height: 16.0),
