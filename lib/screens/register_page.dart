@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:chat_apropo/ircClient.dart';
 import 'package:chat_apropo/models/dbhelpers.dart';
-import 'package:chat_apropo/utils.dart';
 import 'package:flutter/material.dart';
 
 String? validateNickname(String? value) {
@@ -264,6 +263,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               }
                               await db.saveAccount(Account(
                                   nickname: _nickname!, password: _password!));
+                              Navigator.pop(context);
                             }
                           },
                           child: Text(widget.login ? "Login" : "Sign Up"),

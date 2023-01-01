@@ -46,7 +46,10 @@ class IrcClient {
     try {
       await for (final event
           in client.onNotice.timeout(const Duration(seconds: 5))) {
-        var response = event.message!.toLowerCase();
+        var response = event.message!
+            .replaceAll(RegExp(r"\s+"), " ")
+            .replaceAll(RegExp(r"\u0002"), "")
+            .toLowerCase();
         var fromNick = event.from!.name!.toLowerCase();
         if (fromNick == 'nickserv') {
           if (response.contains('is already registered')) {
@@ -60,7 +63,7 @@ class IrcClient {
           }
         }
       }
-    } on TimeoutException catch (e) {
+    } on TimeoutException {
       message = "Registration Timeout";
     }
     return message;
@@ -85,7 +88,7 @@ class IrcClient {
           }
         }
       }
-    } on TimeoutException catch (e) {
+    } on TimeoutException {
       message = "Login Timeout";
     }
     return message;

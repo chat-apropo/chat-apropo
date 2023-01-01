@@ -370,7 +370,7 @@ class DbHelper {
     if (maps.isEmpty) return null;
     // TODO manage multiple accounts?
     return Account(
-      nickname: maps.last['name'],
+      nickname: maps.last['nickname'],
       password: maps.last['password'],
     );
   }
