@@ -12,18 +12,18 @@ import 'screens/homePage.dart';
 const baseFontSize = 14.0;
 
 const textTheme = TextTheme(
-      bodyText1: TextStyle(fontSize: baseFontSize, color: Colors.green),
-      headline1: TextStyle(fontSize: baseFontSize + 4));
+    bodyText1: TextStyle(fontSize: baseFontSize, color: Colors.green),
+    headline1: TextStyle(fontSize: baseFontSize + 4));
 
 final ThemeData myTheme = ThemeData(
-  primarySwatch: Colors.blue,
-  brightness: Brightness.light,
-  textTheme: textTheme);
+    primarySwatch: Colors.blue,
+    brightness: Brightness.light,
+    textTheme: textTheme);
 
 final ThemeData darkTheme = ThemeData(
-  primarySwatch: Colors.blue,
-  brightness: Brightness.dark,
-  textTheme: textTheme);
+    primarySwatch: Colors.blue,
+    brightness: Brightness.dark,
+    textTheme: textTheme);
 
 void main() async {
   if (Platform.isWindows || Platform.isLinux) {
@@ -45,6 +45,8 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     WidgetsFlutterBinding.ensureInitialized();
+    var dbHelper = DbHelper();
+
     return MaterialApp(
       title: 'GasconChat',
       theme: myTheme,
@@ -52,7 +54,17 @@ class App extends StatelessWidget {
       // themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
       // home: const HomePage(),
-      home: const SignUpScreen(),
+      home: FutureBuilder(
+          future: dbHelper.account(),
+          builder: (BuildContext context, AsyncSnapshot<Account?> snapshot) {
+            // data loaded:
+            var account = snapshot.data;
+            if (account == null) {
+              return const SignUpScreen();
+            } else {
+              return HomePage(account: account);
+            }
+          }),
     );
   }
 }

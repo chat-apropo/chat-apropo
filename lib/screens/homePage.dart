@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:chat_apropo/i18n.dart';
+import 'package:chat_apropo/models/dbhelpers.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_apropo/screens/chatPage.dart';
 
@@ -7,7 +8,8 @@ import '../ircClient.dart';
 import 'chanPage.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final Account account;
+  const HomePage({Key? key, required this.account}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -25,8 +27,13 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    _connectAndLogin();
+  }
+
+  Future<void> _connectAndLogin () async {
     var client = IrcClient();
-    client.connect();
+    await client.connect();
+    await client.login(widget.account.nickname, widget.account.password);
   }
 
   @override

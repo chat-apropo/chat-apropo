@@ -354,6 +354,16 @@ class DbHelper {
     _messageQueueRunning = false;
   }
 
+  /// Saves user account
+  Future<void> saveAccount(Account account) async {
+    final db = _db!;
+    final data = {
+      "nickname": account.nickname,
+      "password": account.password,
+    };
+    await db.insert('account', data, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
   /// Retrieves the user account
   Future<Account?> account() async {
     final List<Map<String, dynamic>> maps = await _db!.query('account');

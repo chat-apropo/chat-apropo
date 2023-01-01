@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:chat_apropo/ircClient.dart';
+import 'package:chat_apropo/models/dbhelpers.dart';
 import 'package:chat_apropo/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -15,22 +18,28 @@ String? validateNickname(String? value) {
 }
 
 /// Check with nickserv if the nickname is already taken
-Future<String?> validateNicknameInServer(String? nickname, IrcClient irc) async {
+Future<String?> validateNicknameInServer(
+    String? nickname, IrcClient irc) async {
   String? message;
   irc.client.sendMessage('nickserv', 'info $nickname');
-  await for (final event in irc.client.onMessage) {
-    var response = event.message!.toLowerCase();
-    var fromNick = event.from!.name!.toLowerCase();
-    if (fromNick == 'nickserv') {
-      if (response.contains('isn\'t registered.')) {
-        message = null;
-        break;
-      }
-      if (response.contains('${nickname!.toLowerCase()} is ')) {
-        message = 'Sorry, this nickname is already taken';
-        break;
+  try {
+    await for (final event
+        in irc.client.onMessage.timeout(const Duration(seconds: 5))) {
+      var response = event.message!.toLowerCase();
+      var fromNick = event.from!.name!.toLowerCase();
+      if (fromNick == 'nickserv') {
+        if (response.contains('isn\'t registered.')) {
+          message = null;
+          break;
+        }
+        if (response.contains('${nickname!.toLowerCase()} is ')) {
+          message = 'Sorry, this nickname is already taken';
+          break;
+        }
       }
     }
+  } on TimeoutException {
+    message = 'Failed to get response from server';
   }
   return message;
 }
@@ -227,19 +236,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           onPressed: () async {
                             _formKey.currentState?.save();
                             _nicknameSignupErr = null;
+                            var db = DbHelper();
                             if (_formKey.currentState?.validate() ?? false) {
-                              if (widget.login) {
-                                print(
-                                    'Logging in with: $_nickname, $_password');
-                              } else {
-                                _nicknameSignupErr = await validateNicknameInServer(_nickname, irc);
+                              if (!widget.login) {
+                                // Signup
+                                _nicknameSignupErr =
+                                    await validateNicknameInServer(
+                                        _nickname, irc);
                                 if (_nicknameSignupErr != null) {
                                   _formKey.currentState?.validate();
                                   return;
                                 }
-                                print(
-                                    'singing up with: $_nickname, $_password, $_passwordConfirmation');
+                                _nicknameSignupErr =
+                                    await irc.register(_nickname!, _password!);
+                                if (_nicknameSignupErr != null) {
+                                  _formKey.currentState?.validate();
+                                  return;
+                                }
+                              } else {
+                                // LOGIN
+                                _nicknameSignupErr =
+                                    await irc.login(_nickname!, _password!);
+                                if (_nicknameSignupErr != null) {
+                                  _formKey.currentState?.validate();
+                                  return;
+                                }
                               }
+                              await db.saveAccount(Account(
+                                  nickname: _nickname!, password: _password!));
                             }
                           },
                           child: Text(widget.login ? "Login" : "Sign Up"),
