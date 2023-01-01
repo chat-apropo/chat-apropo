@@ -228,8 +228,12 @@ class IrcText extends StatelessWidget {
       if (nick == null) continue;
       nickRegexStr += "$nick|";
     }
-    nickRegexStr = nickRegexStr.substring(0, nickRegexStr.length - 1);
-    final regNick = RegExp("\\b(${nickRegexStr})\\b", caseSensitive: false);
+    if (nickList.isNotEmpty) {
+      nickRegexStr = nickRegexStr.substring(0, nickRegexStr.length - 1);
+    } else {
+      nickRegexStr = irc.client.nickname ?? "";
+    }
+    final regNick = RegExp("\\b($nickRegexStr)\\b", caseSensitive: false);
     final nickIndexes = regNick.allMatches(message.text).toList();
     var nextNickIndex = 0;
 

@@ -246,16 +246,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   _formKey.currentState?.validate();
                                   return;
                                 }
-                                _nicknameSignupErr =
-                                    await irc.register(_nickname!, _password!);
+                                _nicknameSignupErr = await irc.register(Account(
+                                  nickname: _nickname!,
+                                  password: _password!,
+                                ));
                                 if (_nicknameSignupErr != null) {
                                   _formKey.currentState?.validate();
                                   return;
                                 }
                               } else {
                                 // LOGIN
-                                _nicknameSignupErr =
-                                    await irc.login(_nickname!, _password!);
+                                _nicknameSignupErr = await irc.login(Account(
+                                  nickname: _nickname!,
+                                  password: _password!,
+                                ));
                                 if (_nicknameSignupErr != null) {
                                   _formKey.currentState?.validate();
                                   return;

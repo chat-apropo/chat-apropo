@@ -34,12 +34,18 @@ class IrcClient {
 
     // Connect to the server
     await client.connect();
+
+    if (account != null) {
+      await login(account);
+    }
   }
 
-  Future<String?> register(String nickname, String password) async {
+  Future<String?> register(Account account) async {
     if (!connected) {
       return "Irc client is not connected";
     }
+    String nickname = account.nickname;
+    String password = account.password;
     client.changeNickname(nickname);
     client.sendMessage("nickserv", "register $password");
     String? message;
@@ -69,22 +75,30 @@ class IrcClient {
     return message;
   }
 
-  Future<String?> login(String nickname, String password) async {
+  Future<String?> login(Account account) async {
     if (!connected) {
       return "Irc client is not connected";
     }
+    String nickname = account.nickname;
+    String password = account.password;
     client.changeNickname(nickname);
     client.sendMessage("nickserv", "identify $password");
+    var resent = false;
     String? message;
     try {
       await for (final event
           in client.onNotice.timeout(const Duration(seconds: 5))) {
         var response = event.message!.toLowerCase();
         var fromNick = event.from!.name!.toLowerCase();
+
         if (fromNick == 'nickserv') {
+          print("NICKSERV: $response");
           if (response.contains('you are now recognized')) {
             message = null;
             break;
+          } else if (!resent) {
+            client.sendMessage("nickserv", "identify $password");
+            resent = true;
           }
         }
       }

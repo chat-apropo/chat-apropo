@@ -27,13 +27,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _connectAndLogin();
-  }
-
-  Future<void> _connectAndLogin () async {
     var client = IrcClient();
-    await client.connect();
-    await client.login(widget.account.nickname, widget.account.password);
+    client.connect();
   }
 
   @override

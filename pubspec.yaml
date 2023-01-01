@@ -18,9 +18,9 @@ dependencies:
         url: https://github.com/ostafen/irc.dart
         ref: flutter
   cupertino_icons: ^1.0.2
-  any_link_preview: ^2.0.9
+  any_link_preview: ^3.0.0
   audioplayers: ^1.0.1
-  file_picker: ^4.6.1
+  file_picker: ^5.2.4
   dio: ^4.0.6
   url_launcher: ^6.1.7
 
