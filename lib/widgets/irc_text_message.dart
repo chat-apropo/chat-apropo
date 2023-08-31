@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // Project imports:
-import 'package:chat_apropo/ircClient.dart';
-import '../models/channelMessageModel.dart';
+import 'package:chat_apropo/irc_client.dart';
+import '../models/channel_message_model.dart';
 import '../utils.dart';
 
 final RegExp regIgnoreChars = RegExp(r""",|\.|;|'|@|"|\*|\?|""");
@@ -185,6 +185,7 @@ class IrcText extends StatelessWidget {
   _launchUrl(BuildContext context, String url) async {
     final uri = Uri.parse(url);
     if (!await canLaunchUrl(uri)) {
+      if (!context.mounted) return;
       showToast(context,
           "Could not open the url. Make sure you've allowed the app to open links.");
     }

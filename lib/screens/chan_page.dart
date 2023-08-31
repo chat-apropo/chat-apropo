@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 // Project imports:
 import 'package:chat_apropo/i18n.dart';
-import 'package:chat_apropo/models/channelMessageModel.dart';
-import '../models/chanModel.dart';
+import 'package:chat_apropo/models/channel_message_model.dart';
+import '../models/chan_model.dart';
 import '../utils.dart';
-import '../widgets/conversationList.dart';
+import '../widgets/conversation_list.dart';
 
 class ChanPage extends StatefulWidget {
   const ChanPage({Key? key}) : super(key: key);
@@ -68,7 +68,7 @@ class _ChanPageState extends State<ChanPage> {
                     ),
                     IconButton(
                       onPressed: () {
-                        print("TODO config");
+                        debugPrint("TODO config");
                         i18nSetLanguage(i18nLocale == "pt" ? "en" : "pt");
                         setState(() {});
                       },

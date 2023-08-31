@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 
 // Project imports:
-import 'package:chat_apropo/screens/chatDetailPage.dart';
-import '../screens/chanDetailPage.dart';
+import 'package:chat_apropo/screens/chat_detail_page.dart';
+import '../screens/chan_detail_page.dart';
 
 // ignore: must_be_immutable
 class ConversationList extends StatefulWidget {

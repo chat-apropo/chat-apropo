@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 // Project imports:
-import '../models/chatMessageModel.dart';
+import '../models/chat_message_model.dart';
 
 class ChatDetailPage extends StatefulWidget {
   const ChatDetailPage({Key? key}) : super(key: key);

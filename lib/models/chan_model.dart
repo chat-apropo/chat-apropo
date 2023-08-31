@@ -1,5 +1,5 @@
 // Project imports:
-import 'package:chat_apropo/models/channelMessageModel.dart';
+import 'package:chat_apropo/models/channel_message_model.dart';
 
 class Channel {
   String name;

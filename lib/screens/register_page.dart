@@ -5,17 +5,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 // Project imports:
-import 'package:chat_apropo/ircClient.dart';
+import 'package:chat_apropo/irc_client.dart';
 import 'package:chat_apropo/models/dbhelpers.dart';
-import 'package:chat_apropo/screens/homePage.dart';
+import 'package:chat_apropo/screens/home_page.dart';
 
 String? validateNickname(String? value) {
   if (value?.isEmpty ?? true) {
     return 'Please enter a nickname';
   }
   // Validate with regex for a valid nickname
-  const irc_nick_re = r"^[a-z][a-z0-9]{2,}$";
-  if (!RegExp(irc_nick_re, caseSensitive: false).hasMatch(value!)) {
+  const ircNickRE = r"^[a-z][a-z0-9]{2,}$";
+  if (!RegExp(ircNickRE, caseSensitive: false).hasMatch(value!)) {
     return 'Sorry, this nickname is not valid';
   }
   return null;
@@ -113,14 +113,15 @@ class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key, this.login = false});
 
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  SignUpScreenState createState() => SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   String? _nicknameSignupErr;
   String? _nickname;
   String? _password;
+  // ignore: unused_field
   String? _passwordConfirmation;
 
   var irc = IrcClient();
@@ -273,6 +274,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               var account = Account(
                                   nickname: _nickname!, password: _password!);
                               await db.saveAccount(account);
+                              if (!context.mounted) return;
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

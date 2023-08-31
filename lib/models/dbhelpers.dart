@@ -10,8 +10,8 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 // Project imports:
-import 'package:chat_apropo/models/chanModel.dart';
-import 'package:chat_apropo/models/channelMessageModel.dart';
+import 'package:chat_apropo/models/chan_model.dart';
+import 'package:chat_apropo/models/channel_message_model.dart';
 
 const dbFilename = 'messages.db';
 const dbVersion = 1;

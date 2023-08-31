@@ -12,7 +12,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:chat_apropo/models/dbhelpers.dart';
 import 'package:chat_apropo/screens/register_page.dart';
 import 'i18n.dart';
-import 'screens/homePage.dart';
+import 'screens/home_page.dart';
 
 const baseFontSize = 14.0;
 

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 // Project imports:
 import 'package:chat_apropo/utils.dart';
-import '../models/chatUsersModel.dart';
-import '../widgets/conversationList.dart';
+import '../models/chat_users_model.dart';
+import '../widgets/conversation_list.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
@@ -66,8 +66,8 @@ class _ChatPageState extends State<ChatPage> {
                         borderRadius: BorderRadius.circular(30),
                         color: Colors.pink[50],
                       ),
-                      child: Row(
-                        children: const <Widget>[
+                      child: const Row(
+                        children: <Widget>[
                           Icon(
                             Icons.add,
                             color: Colors.pink,

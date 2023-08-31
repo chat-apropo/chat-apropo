@@ -96,7 +96,6 @@ class IrcClient {
         var fromNick = event.from!.name!.toLowerCase();
 
         if (fromNick == 'nickserv') {
-          print("NICKSERV: $response");
           if (response.contains('you are now recognized')) {
             message = null;
             break;

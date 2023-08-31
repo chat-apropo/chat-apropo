@@ -1,15 +1,12 @@
 // Flutter imports:
 import 'package:flutter/material.dart';
 
-// Package imports:
-import 'package:audioplayers/audioplayers.dart';
-
 // Project imports:
 import 'package:chat_apropo/i18n.dart';
 import 'package:chat_apropo/models/dbhelpers.dart';
-import 'package:chat_apropo/screens/chatPage.dart';
-import '../ircClient.dart';
-import 'chanPage.dart';
+import 'package:chat_apropo/screens/chat_page.dart';
+import '../irc_client.dart';
+import 'chan_page.dart';
 
 class HomePage extends StatefulWidget {
   final Account account;
