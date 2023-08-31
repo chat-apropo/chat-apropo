@@ -1,5 +1,7 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
 
+// Project imports:
 import '../models/chatMessageModel.dart';
 
 class ChatDetailPage extends StatefulWidget {
@@ -90,8 +92,8 @@ class ChatDetailPageState extends State<ChatDetailPage> {
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               return Container(
-                padding:
-                    const EdgeInsets.only(left: 14, right: 14, top: 10, bottom: 10),
+                padding: const EdgeInsets.only(
+                    left: 14, right: 14, top: 10, bottom: 10),
                 child: Align(
                   alignment: (messages[index].messageType == "receiver"
                       ? Alignment.topLeft

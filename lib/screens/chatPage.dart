@@ -1,6 +1,8 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:chat_apropo/utils.dart';
 
+// Project imports:
+import 'package:chat_apropo/utils.dart';
 import '../models/chatUsersModel.dart';
 import '../widgets/conversationList.dart';
 
@@ -14,18 +16,11 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   List<ChatUsers> chatUsers = [
+    ChatUsers(name: "Jane Russel", messageText: "Awesome Setup", time: "Now"),
     ChatUsers(
-        name: "Jane Russel",
-        messageText: "Awesome Setup",
-        time: "Now"),
+        name: "Glady's Murphy", messageText: "That's Great", time: "Yesterday"),
     ChatUsers(
-        name: "Glady's Murphy",
-        messageText: "That's Great",
-        time: "Yesterday"),
-    ChatUsers(
-        name: "Jorge Henry",
-        messageText: "Hey where are you?",
-        time: "31 Mar"),
+        name: "Jorge Henry", messageText: "Hey where are you?", time: "31 Mar"),
     ChatUsers(
         name: "Philip Fox",
         messageText: "Busy! Call me in 20 mins",
@@ -42,10 +37,7 @@ class _ChatPageState extends State<ChatPage> {
         name: "Andrey Jones",
         messageText: "Can you please share the file?",
         time: "24 Feb"),
-    ChatUsers(
-        name: "John Wick",
-        messageText: "How are you?",
-        time: "18 Feb"),
+    ChatUsers(name: "John Wick", messageText: "How are you?", time: "18 Feb"),
   ];
   @override
   Widget build(BuildContext context) {

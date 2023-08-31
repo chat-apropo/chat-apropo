@@ -1,11 +1,17 @@
+// Dart imports:
 import 'dart:collection';
 import 'dart:io';
 
-import 'package:chat_apropo/models/chanModel.dart';
-import 'package:chat_apropo/models/channelMessageModel.dart';
+// Flutter imports:
 import 'package:flutter/widgets.dart';
+
+// Package imports:
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+
+// Project imports:
+import 'package:chat_apropo/models/chanModel.dart';
+import 'package:chat_apropo/models/channelMessageModel.dart';
 
 const dbFilename = 'messages.db';
 const dbVersion = 1;
@@ -361,7 +367,8 @@ class DbHelper {
       "nickname": account.nickname,
       "password": account.password,
     };
-    await db.insert('account', data, conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert('account', data,
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   /// Retrieves the user account

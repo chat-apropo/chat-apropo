@@ -1,8 +1,13 @@
+// Dart imports:
 import 'dart:async';
 
+// Flutter imports:
+import 'package:flutter/material.dart';
+
+// Project imports:
 import 'package:chat_apropo/ircClient.dart';
 import 'package:chat_apropo/models/dbhelpers.dart';
-import 'package:flutter/material.dart';
+import 'package:chat_apropo/screens/homePage.dart';
 
 String? validateNickname(String? value) {
   if (value?.isEmpty ?? true) {
@@ -265,9 +270,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   return;
                                 }
                               }
-                              await db.saveAccount(Account(
-                                  nickname: _nickname!, password: _password!));
-                              Navigator.pop(context);
+                              var account = Account(
+                                  nickname: _nickname!, password: _password!);
+                              await db.saveAccount(account);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      HomePage(account: account),
+                                ),
+                              );
                             }
                           },
                           child: Text(widget.login ? "Login" : "Sign Up"),

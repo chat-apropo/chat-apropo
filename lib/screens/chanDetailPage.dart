@@ -1,16 +1,21 @@
+// Dart imports:
 import 'dart:async';
 
-import 'package:chat_apropo/i18n.dart';
-import 'package:chat_apropo/models/dbhelpers.dart';
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:chat_apropo/ircClient.dart';
-import 'package:chat_apropo/models/channelMessageModel.dart';
-import 'package:chat_apropo/widgets/ircTextMessage.dart';
-import 'package:any_link_preview/any_link_preview.dart';
 import 'package:flutter/scheduler.dart';
 
-import '../widgets/uploadFabMenu.dart';
+// Package imports:
+import 'package:any_link_preview/any_link_preview.dart';
+
+// Project imports:
+import 'package:chat_apropo/i18n.dart';
+import 'package:chat_apropo/ircClient.dart';
+import 'package:chat_apropo/models/channelMessageModel.dart';
+import 'package:chat_apropo/models/dbhelpers.dart';
+import 'package:chat_apropo/widgets/ircTextMessage.dart';
 import '../widgets/audioPlayer.dart';
+import '../widgets/uploadFabMenu.dart';
 
 // Number of pixels to scroll up by to show the go to bottom button
 const showScrolldownButtonWhenScolledUpBy = 400;
@@ -126,7 +131,9 @@ class ChanDetailPageState extends State<ChanDetailPage> {
     irc.client.onClientJoin.listen((event) {
       setState(() {
         messages.add(ChannelMessage(
-            text: "JOINED CHANNEL".i18n, sender: widget.channel, channel: channel));
+            text: "JOINED CHANNEL".i18n,
+            sender: widget.channel,
+            channel: channel));
       });
     });
 
@@ -140,7 +147,9 @@ class ChanDetailPageState extends State<ChanDetailPage> {
         return;
       }
       var message = ChannelMessage(
-          text: event.message ?? "", sender: event.from?.name ?? "--", channel: widget.channel);
+          text: event.message ?? "",
+          sender: event.from?.name ?? "--",
+          channel: widget.channel);
       dbHelper.addMessage(message);
       setState(() {
         messages.add(message);

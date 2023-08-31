@@ -1,7 +1,9 @@
-import 'package:chat_apropo/i18n.dart';
-import 'package:chat_apropo/models/channelMessageModel.dart';
+// Flutter imports:
 import 'package:flutter/material.dart';
 
+// Project imports:
+import 'package:chat_apropo/i18n.dart';
+import 'package:chat_apropo/models/channelMessageModel.dart';
 import '../models/chanModel.dart';
 import '../utils.dart';
 import '../widgets/conversationList.dart';

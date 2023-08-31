@@ -1,7 +1,11 @@
+// Dart imports:
 import 'dart:async';
 
-import 'package:chat_apropo/models/dbhelpers.dart';
+// Package imports:
 import "package:irc/client.dart";
+
+// Project imports:
+import 'package:chat_apropo/models/dbhelpers.dart';
 
 // Singleton irc client
 class IrcClient {

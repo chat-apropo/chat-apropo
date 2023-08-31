@@ -1,5 +1,8 @@
-import 'package:audioplayers/audioplayers.dart';
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:audioplayers/audioplayers.dart';
 
 String formatTime(Duration duration) {
   String twoDigits(int n) => n.toString().padLeft(2, "0");
@@ -56,13 +59,12 @@ class AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   Future setAudio() async {
     await AudioPlayer.global.changeLogLevel(LogLevel.info);
     // audioPlayer.setReleaseMode(ReleaseMode.loop);
-    WidgetsBinding.instance
-          .addPostFrameCallback((_) async {
-        await audioPlayer.setSourceUrl(widget.url);
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await audioPlayer.setSourceUrl(widget.url);
+    });
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 400,

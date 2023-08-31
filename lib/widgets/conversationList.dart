@@ -1,6 +1,8 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:chat_apropo/screens/chatDetailPage.dart';
 
+// Project imports:
+import 'package:chat_apropo/screens/chatDetailPage.dart';
 import '../screens/chanDetailPage.dart';
 
 // ignore: must_be_immutable

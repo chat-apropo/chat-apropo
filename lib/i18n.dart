@@ -1,5 +1,7 @@
+// Dart imports:
 import 'dart:convert';
 
+// Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -18,7 +20,9 @@ Future i18nLoad() async {
   var assets = await rootBundle.loadString('AssetManifest.json');
   var assetsMap = json.decode(assets);
   // Filter only *.json files inside i18n directory
-  List i18nfiles = assetsMap.keys.where((key) => key.contains('i18n/') && key.endsWith(".json")).toList();
+  List i18nfiles = assetsMap.keys
+      .where((key) => key.contains('i18n/') && key.endsWith(".json"))
+      .toList();
   for (var i18nfile in i18nfiles) {
     debugPrint("Loading i18n file: $i18nfile");
     final file = await rootBundle.loadString(i18nfile);
@@ -26,11 +30,11 @@ Future i18nLoad() async {
     try {
       var stringMap = map.cast<String, String>();
       // Simplify keys
-      stringMap = stringMap.map((key, value) => MapEntry(simplifyKey(key), value));
+      stringMap =
+          stringMap.map((key, value) => MapEntry(simplifyKey(key), value));
 
       final fileKey = i18nfile.split("/").last.split(".").first;
       i18nFileMap[fileKey] = stringMap;
-
     } catch (e) {
       debugPrint("No translation found. Need to add: $i18nfile");
       debugPrint(e.toString());

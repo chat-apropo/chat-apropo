@@ -4,7 +4,12 @@ class ChannelMessage {
   late String channel;
   late bool isMine;
   DateTime? timestamp;
-  ChannelMessage({required this.text, required this.sender, required this.channel, this.isMine=false, this.timestamp}) {
+  ChannelMessage(
+      {required this.text,
+      required this.sender,
+      required this.channel,
+      this.isMine = false,
+      this.timestamp}) {
     timestamp ??= DateTime.now();
   }
 

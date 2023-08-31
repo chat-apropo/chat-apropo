@@ -1,9 +1,13 @@
+// Flutter imports:
+import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:audioplayers/audioplayers.dart';
+
+// Project imports:
 import 'package:chat_apropo/i18n.dart';
 import 'package:chat_apropo/models/dbhelpers.dart';
-import 'package:flutter/material.dart';
 import 'package:chat_apropo/screens/chatPage.dart';
-
 import '../ircClient.dart';
 import 'chanPage.dart';
 
@@ -33,8 +37,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    bottomNavbarVisible = MediaQuery.of(context).size.height >
-        MediaQuery.of(context).size.width;
+    bottomNavbarVisible =
+        MediaQuery.of(context).size.height > MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: Row(

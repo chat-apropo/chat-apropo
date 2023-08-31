@@ -1,8 +1,12 @@
-import 'package:chat_apropo/ircClient.dart';
+// Flutter imports:
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:url_launcher/url_launcher.dart';
 
+// Project imports:
+import 'package:chat_apropo/ircClient.dart';
 import '../models/channelMessageModel.dart';
 import '../utils.dart';
 
@@ -241,7 +245,9 @@ class IrcText extends StatelessWidget {
       // ----------------------------------------------------------------
       // URL handling
       final nextUrlMatch =
-          urlIndexes.isNotEmpty && urlIndexes.length > nextUrlIndex ? urlIndexes.elementAt(nextUrlIndex) : null;
+          urlIndexes.isNotEmpty && urlIndexes.length > nextUrlIndex
+              ? urlIndexes.elementAt(nextUrlIndex)
+              : null;
       if (nextUrlMatch != null && i == nextUrlMatch.start) {
         final url = nextUrlMatch.group(0) ?? "";
         textSpans.add(
@@ -267,7 +273,9 @@ class IrcText extends StatelessWidget {
       // ----------------------------------------------------------------
       // Nick handling
       var nextNickMatch =
-          nickIndexes.isNotEmpty && nickIndexes.length > nextNickIndex ? nickIndexes.elementAt(nextNickIndex) : null;
+          nickIndexes.isNotEmpty && nickIndexes.length > nextNickIndex
+              ? nickIndexes.elementAt(nextNickIndex)
+              : null;
       if (nextNickMatch != null && i == nextNickMatch.start) {
         final nick = nextNickMatch.group(0) ?? "";
         textSpans.add(TextSpan(

@@ -1,19 +1,24 @@
+// Dart imports:
 import 'dart:io';
 
+// Flutter imports:
+import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+// Project imports:
 import 'package:chat_apropo/models/dbhelpers.dart';
 import 'package:chat_apropo/screens/register_page.dart';
-import 'package:flutter/material.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:sqflite/sqflite.dart';
-
 import 'i18n.dart';
 import 'screens/homePage.dart';
 
 const baseFontSize = 14.0;
 
 const textTheme = TextTheme(
-    bodyText1: TextStyle(fontSize: baseFontSize, color: Colors.green),
-    headline1: TextStyle(fontSize: baseFontSize + 4));
+    bodyLarge: TextStyle(fontSize: baseFontSize, color: Colors.green),
+    displayLarge: TextStyle(fontSize: baseFontSize + 4));
 
 final ThemeData myTheme = ThemeData(
     primarySwatch: Colors.blue,

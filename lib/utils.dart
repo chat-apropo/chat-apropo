@@ -1,6 +1,8 @@
-
-import 'package:chat_apropo/i18n.dart';
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Project imports:
+import 'package:chat_apropo/i18n.dart';
 
 final List<Color> userColorPallete = <Color>[
   Colors.blue[200]!,

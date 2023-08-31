@@ -1,9 +1,15 @@
+// Dart imports:
 import 'dart:io';
+
+// Flutter imports:
+import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:dio/dio.dart' as dio;
+import 'package:file_picker/file_picker.dart';
 import 'package:http_parser/http_parser.dart';
 
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+// Project imports:
 import 'package:chat_apropo/utils.dart';
 
 enum FailReason {
