@@ -2,7 +2,7 @@ repos:
 - repo: https://github.com/fluttercommunity/import_sorter
   rev: 'f350497a11b1285c695595049e95a420068e7a9f'
   hooks:
-    - id: dart-import-sorter # use `flutter-import-sorter` for a Flutter project
+    - id: flutter-import-sorter
 - repo: https://github.com/matheusfillipe/flutter-format-pre-commit
   rev: "c581999d922b9a4666428b97fc8f2e9ccad831c3"
   hooks:
