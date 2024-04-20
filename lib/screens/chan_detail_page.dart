@@ -127,43 +127,6 @@ class ChanDetailPageState extends State<ChanDetailPage> {
   void initState() {
     super.initState();
     channel = widget.channel;
-
-    // Joined channel
-    irc.client.onClientJoin.listen((event) {
-      setState(() {
-        messages.add(ChannelMessage(
-            text: "JOINED CHANNEL".i18n,
-            sender: widget.channel,
-            channel: channel));
-      });
-    });
-
-    // Message arrived
-    irc.client.onMessage.listen((event) async {
-      debugPrint(
-          "<${event.target!.name}><${event.from?.name}> ${event.message}");
-
-      // TODO background service populating all messages for all joined channels database
-      if (event.target?.name != widget.channel) {
-        return;
-      }
-      var message = ChannelMessage(
-          text: event.message ?? "",
-          sender: event.from?.name ?? "--",
-          channel: widget.channel);
-      dbHelper.addMessage(message);
-      setState(() {
-        messages.add(message);
-
-        var pos = scrollController.position.pixels;
-        var distanceToBottom = scrollController.position.maxScrollExtent - pos;
-        if (!showGoToBottomButton ||
-            distanceToBottom < showScrolldownButtonWhenScolledUpBy) {
-          scrollDown();
-        }
-      });
-    });
-
     _join();
 
     // Updates timestamps
@@ -219,9 +182,11 @@ class ChanDetailPageState extends State<ChanDetailPage> {
   }
 
   @override
-  void dispose() {
+  dispose() {
     textFocusNode.dispose();
     _updateTimestampsTimer.cancel();
+    irc.unsubscribe("${channel}_onClientJoin");
+    irc.unsubscribe("${channel}_onMessage");
     super.dispose();
   }
 
