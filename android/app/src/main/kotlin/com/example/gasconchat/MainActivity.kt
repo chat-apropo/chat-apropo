@@ -1,4 +1,4 @@
-package com.example.chatapropo
+package com.chatapropo.chatapropo
 
 import io.flutter.embedding.android.FlutterActivity
 

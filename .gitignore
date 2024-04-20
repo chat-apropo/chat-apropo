@@ -50,3 +50,4 @@ ios/Podfile
 macos/Podfile
 macos/Podfile.lock
 .ccls-cache/
+android/key.properties
